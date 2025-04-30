@@ -25,6 +25,10 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     Route::post('/documents/upload', [MedicalDocumentController::class, 'upload']);
     Route::middleware('auth:sanctum')->get('/documents/{id}/download', [MedicalDocumentController::class, 'download']);
     Route::middleware('auth:sanctum')->get('/documents', [MedicalDocumentController::class, 'index']);
+    Route::middleware('auth:sanctum')->get('/documents/EGC/count', [MedicalDocumentController::class, 'EGCCount']);
+    Route::middleware('auth:sanctum')->get('/documents/Report/count', [MedicalDocumentController::class, 'ReportCount']);
+    Route::middleware('auth:sanctum')->get('/documents/EGC/lab_result', [MedicalDocumentController::class, 'LabResultCount']);
+
 
 
     //users routes
@@ -61,7 +65,8 @@ Route::middleware('auth:sanctum')->get('/patients/count', [PatientController::cl
     Route::post('/notifications/mark-all-read', [NotificationController::class, 'markAllAsRead']);
     Route::delete('/notifications/{id}', [NotificationController::class, 'destroy']);
     Route::middleware('auth:sanctum')->get('/notifications/count', [NotificationController::class, 'CountNotification']);
-
+    Route::middleware('auth:sanctum')->get('/notifications/appointment-count', [NotificationController::class, 'CountAppointmentNotification']);
+    Route::middleware('auth:sanctum')->get('/notifications/today_appointment', [NotificationController::class, 'TodayAppointment']);
 
 
 

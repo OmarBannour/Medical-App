@@ -1,6 +1,7 @@
 <?php
 
 namespace App\Http\Controllers;
+
 use Illuminate\Http\Request;
 use App\Models\MedicalDocument;
 use Illuminate\Support\Facades\Auth;
@@ -103,10 +104,10 @@ class MedicalDocumentController extends Controller
             } else {
                 // If not admin (patient), fetch documents linked to both user and patient tables
                 $documents = MedicalDocument::where('user_id', $user->id)
-                                             ->orWhereIn('user_id', function ($query) use ($user) {
-                                                 $query->select('user_id')->from('patients')->where('patients.user_id', $user->id);
-                                             })
-                                             ->get();
+                    ->orWhereIn('user_id', function ($query) use ($user) {
+                        $query->select('user_id')->from('patients')->where('patients.user_id', $user->id);
+                    })
+                    ->get();
             }
 
             return response()->json($documents);
@@ -116,53 +117,104 @@ class MedicalDocumentController extends Controller
                 'error' => $e->getMessage()
             ], 500);
         }
+    }
 
+    // count the number of documents where the type is "EGC"
+    public function EGCCount()
+    {
+        try {
+            $user = Auth::user(); // Get the authenticated user
 
+            // Check if the user is an admin or a patient
+            if ($user->role === 'admin') {
+                // If admin, fetch all documents
+                $count = MedicalDocument::where('type', 'EGC')->count();
+            } else {
+                return response()->json(['message' => 'Accès interdit'], 403);
+            }
 
-   /// public function analyzeDocument(Request $request)
-    //{
-        // Validate the uploaded file
-     //   $request->validate([
-       //     'file' => 'required|file|mimes:jpg,jpeg,png,pdf,docx,xlsx,txt',
-        //]);
+            return response()->json($count);
+        } catch (\Exception $e) {
+            return response()->json([
+                'message' => 'Une erreur est survenue lors de la récupération du nombre de documents.',
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    }
+    public function ReportCount()
+    {
+        try {
+            $user = Auth::user(); // Get the authenticated user
 
-        // Upload the file
-        //$file = $request->file('file');
+            // Check if the user is an admin or a patient
+            if ($user->role === 'admin') {
+                // If admin, fetch all documents
+                $count = MedicalDocument::where('type', 'Report')->count();
+            } else {
+                return response()->json(['message' => 'Accès interdit'], 403);
+            }
 
-        //$path = $file->store('medical_documents', 'public');
-        //$fileContent= file_get_contents(storage_path("app/public/{$path}"));
-        ////  ->withApiKey('YOUR_DEEPSEEK_API_KEY')
-            //->withBaseUri('https://api.deepseek.com')
-            //->make();
-
-        // Send the file content to DeepSeek API
-        //try {
-           // $response = $client->chat()->create([
-             //   'model' => 'deepseek-chat',
-               // 'messages' => [
-                 //   ['role' => 'system', 'content' => 'You are a helpful medical assistant.'],
-                   // ['role' => 'user', 'content' => $fileContent],
-                //],
-                //'stream' => false,
-            //]);
-
-            // Extract the response
-            //$result = $response['choices'][0]['message']['content'];
-
-            // Delete the temporary file
-            //unlink(storage_path('app/' . $path));
-
-            // Return the result
-            //return response()->json([
-              //  'result' => $result,
-            //]);
-       // } catch (\Exception $e) {
-            // Handle errors
-         //   return response()->json([
-           //     'message' => 'An error occurred while analyzing the document.',
-              //  'error' => $e->getMessage(),
-            //], 500);
-        //}
-    //}
+            return response()->json($count);
+        } catch (\Exception $e) {
+            return response()->json([
+                'message' => 'Une erreur est survenue lors de la récupération du nombre de documents.',
+                'error' => $e->getMessage()
+            ], 500);
+        }
 }
+public function LabResultCount()
+{
+    try {
+        $user = Auth::user(); // Get the authenticated user
+
+        // Check if the user is an admin or a patient
+        if ($user->role === 'admin') {
+            // If admin, fetch all documents
+            $count = MedicalDocument::where('type', 'Lab Result')->count();
+        } else {
+            return response()->json(['message' => 'Accès interdit'], 403);
+        }
+
+        return response()->json($count);
+    } catch (\Exception $e) {
+        return response()->json([
+            'message' => 'Une erreur est survenue lors de la récupération du nombre de documents.',
+            'error' => $e->getMessage()
+        ], 500);
+    }
+}
+
+    public function destroy($id)
+    {
+        try {
+            // Find the document
+            $document = MedicalDocument::find($id);
+
+            if (!$document) {
+                return response()->json(['message' => 'Document non trouvé'], 404);
+            }
+
+            // Ensure the document belongs to the authenticated user
+            if ($document->user_id !== Auth::id()) {
+                return response()->json(['message' => 'Accès interdit'], 403);
+            }
+
+            // Delete the file from storage
+            $filePath = storage_path("app/public/{$document->file_path}");
+            if (file_exists($filePath)) {
+                unlink($filePath);
+            }
+
+            // Delete the document record
+            $document->delete();
+
+            return response()->json(['message' => 'Document supprimé avec succès']);
+        } catch (\Exception $e) {
+            Log::error('File Deletion Error:', ['error' => $e->getMessage()]);
+            return response()->json([
+                'message' => 'Une erreur est survenue lors de la suppression du fichier.',
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    }
 }
