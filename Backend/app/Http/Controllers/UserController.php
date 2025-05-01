@@ -34,10 +34,30 @@ class UserController extends Controller
         // Validate incoming data
         $validate = request()->validate([
             'name' => 'required|string|max:255',
-            'email' => 'required|email|unique:users,email',
-            'password' => 'required|string|min:8',
+            'email' => 'required|email|unique:users,email|max:255',
+            'password' => [
+                'unique:users,password',
+                'required',
+                'string',
+                'min:12',
+                'max:255',
+                'regex:/[A-Z]/',
+                'regex:/[a-z]/',
+                'regex:/[0-9]/',
+                'regex:/[!@#$%^&*(),.?":{}|<>]/',
+                'not_in:password,12345678,qwerty,admin123',
+            ],
             'role' => 'required|string',
         ]);
+
+        try {
+            $hasMx = checkdnsrr(explode('@', request()->email)[1], 'MX');
+        } catch (\Exception $e) {
+            $hasMx = false;
+        }
+        if (!$hasMx) {
+            return back()->withErrors(['email' => 'Invalid email domain.']);
+        }
 
         // Hash the password before saving
         $rawPassword = $validate['password'];
@@ -47,10 +67,6 @@ class UserController extends Controller
         // Create user
         $User = User::create($validate);
         $User->save();
-
-        // Send email with login credentials
-        $User->notify(new NewUserCreated($User, $rawPassword));
-
         // Generate a unique patient code
         $patientCode = 'PAT-' . strtoupper(Str::random(10));
 
@@ -58,10 +74,11 @@ class UserController extends Controller
         $patient = Patient::create([
             'name' => $User->name,
             'email' => $User->email,
-            'password' => $User->password, // Not recommended to store patient password like this
+            'password' => $User->password,
             'user_id' => $User->id,
             'patient_code' => $patientCode,
         ]);
+        $User->notify(new NewUserCreated($User, $rawPassword));
 
         // Optionally save the patient, but it's not necessary as `create` already does that
         $patient->save();

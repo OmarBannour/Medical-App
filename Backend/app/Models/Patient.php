@@ -21,20 +21,12 @@ class Patient extends Model
         'email',
         'password',
         'patient_code',
+        'user_id',
+
 
 
     ];
 
-    public function scopeMale($query){
-        return $query->where('gender' ,'Male');
-    }
-    public function scopeFemale($query){
-        return $query->where('gendre','Female');
-}
-    public function scopeWithTreatment($query ,$Traitment){
-        return $query->where('Traitment',$Traitment);
-
-}
 
 public function MedicalDocument(){
     return $this->belongsTo(MedicalDocument::class);

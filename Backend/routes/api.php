@@ -10,6 +10,8 @@ use App\Http\Controllers\UserController;
 use App\Models\Patient;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\PdfController;
+use App\Models\Notification;
+use App\Http\Controllers\EcgController;
 
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
@@ -27,7 +29,7 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     Route::middleware('auth:sanctum')->get('/documents', [MedicalDocumentController::class, 'index']);
     Route::middleware('auth:sanctum')->get('/documents/EGC/count', [MedicalDocumentController::class, 'EGCCount']);
     Route::middleware('auth:sanctum')->get('/documents/Report/count', [MedicalDocumentController::class, 'ReportCount']);
-    Route::middleware('auth:sanctum')->get('/documents/EGC/lab_result', [MedicalDocumentController::class, 'LabResultCount']);
+    Route::middleware('auth:sanctum')->get('/documents/lab_result/count', [MedicalDocumentController::class, 'LabResultCount']);
 
 
 
@@ -71,6 +73,17 @@ Route::middleware('auth:sanctum')->get('/patients/count', [PatientController::cl
 
 
 Route::middleware('auth:sanctum')->post('/analyze-pdf', [PdfController::class, 'analyzePdf']);
+
+
+// search routes
+
+Route::middleware('auth:sanctum')->get('/patients/females' , [PatientController::class , 'getfemalePatients']);
+Route::middleware('auth:sanctum')->get('/patients/males' , [PatientController::class , 'getmalePatients']);
+ // charts Routes
+Route::middleware('auth:sanctum')->get('/patients/NumberEvolution', [PatientController::class, 'patientEvolution']);
+Route::middleware('auth:sanctum')->get('/notifications/NumberEvolution', [Notification::class, 'appointmentEvolution']);
+
+//EGC routes
 
 
 

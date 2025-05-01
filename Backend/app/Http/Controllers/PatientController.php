@@ -4,7 +4,9 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Patient;
+use Carbon\Carbon;
 use Illuminate\Support\Facades\Log;
+
 
 
 class PatientController extends Controller
@@ -96,4 +98,25 @@ class PatientController extends Controller
         $patient -> delete();
         return response( )->noContent();
     }
+
+    // function to get the patients by gender
+    public function getfemalePatients(){
+        $female=Patient::where('gender' , 'female')->get();
+        return response()->json($female);
+    }
+
+    public function getmalePatients(){
+        $male=Patient::where('gender','male')->get();
+        return response()->json($male);
+}
+
+public function patientEvolution(){
+    $data= Patient::selectRaw('MONTH(created_at) as month, COUNT(*) as count')
+    ->groupBy('month')
+    ->orderBy('month')
+    ->get();
+
+    return response()->json($data);
+
+}
 }

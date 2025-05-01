@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
@@ -10,40 +11,46 @@ class PdfController extends Controller
 {
     public function analyzePdf(Request $request)
     {
+        // Validate the uploaded file
         $request->validate([
-            'file' => 'required|file|mimes:pdf,jpg,jpeg,png|max:5120', // 5MB max
+            'file' => 'required|file|mimes:pdf|max:5120', // 5MB max
         ]);
 
         $file = $request->file('file');
-        $mimeType = $file->getMimeType();
-        $isImage = str_starts_with($mimeType, 'image/');
 
         try {
-            if ($isImage) {
-                $response = Http::timeout(120)
-                    ->attach('file', file_get_contents($file->path()), $file->getClientOriginalName())
-                    ->post('http://localhost:5000/analyze-image');
-            } else {
-                $parser = new Parser();
-                $text = $parser->parseFile($file->path())->getText();
-                $text = substr($text, 0, 30000); // Limit text size
+            // Parse the PDF file to extract text
+            $parser = new Parser();
+            $pdf = $parser->parseFile($file->path());
+            $text = $pdf->getText();
 
-                $response = Http::timeout(60)
-                    ->post('http://localhost:5000/analyze', [
-                        'text' => $text
-                    ]);
+            // Limit text size to prevent request issues
+            $text = substr($text, 0, 30000);
+
+            // Send the extracted text to the Flask API for analysis
+            $response = Http::timeout(90) // Set a longer timeout
+                ->acceptJson()
+                ->withHeaders([
+                    'Content-Type' => 'application/json',
+                ])
+                ->post('http://localhost:5000/analyze', [
+                    'text' => $text
+                ]);
+
+            // Check if the request was successful
+            if ($response->successful()) {
+                return $response->json();
+            } else {
+                return response()->json([
+                    'error' => 'Analysis service returned an error',
+                    'status' => $response->status(),
+                    'message' => $response->body()
+                ], $response->status());
             }
 
-            return $response->json();
-
-        } catch (\Illuminate\Http\Client\ConnectionException $e) {
+        } catch (\Exception $e) {
             return response()->json([
-                'error' => 'Connection timeout',
-                'message' => 'The analysis server took too long to respond'
-            ], 504);
-        } catch (Exception $e) {
-            return response()->json([
-                'error' => 'Processing failed',
+                'error' => 'An error occurred while processing the PDF',
                 'details' => $e->getMessage()
             ], 500);
         }

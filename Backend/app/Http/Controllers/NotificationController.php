@@ -85,7 +85,7 @@ class NotificationController extends Controller
             ->count();
         return response()->json($count);
     }
-    
+
 
     public function CountNotification()
     {
@@ -146,4 +146,14 @@ class NotificationController extends Controller
         $notification->delete();
         return response()->json(null, 204);
     }
+// chart data for the appointment evolution
+    public function appointmentEvolution()
+{
+    $data = Notification::selectRaw('MONTH(date) as month, COUNT(*) as count')
+        ->groupBy('month')
+        ->orderBy('month')
+        ->get();
+
+    return response()->json($data);
+}
 }

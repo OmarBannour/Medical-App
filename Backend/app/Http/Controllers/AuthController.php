@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\RateLimiter;
 
 
 
@@ -21,7 +22,15 @@ class AuthController extends Controller
             'email' => 'required|string|email',
             'password' => 'required|string',
         ]);
-        
+
+        if (RateLimiter::tooManyAttempts('login:'.$request->ip(), 5)) {
+            return response()->json([
+                'message' => 'Too many login attempts. Please try again later.',
+            ], 429);
+        }
+
+        RateLimiter::hit('login:'.$request->ip());
+
 
         // Find user by email
         $user = User::where('email', $credentials['email'])->first();
@@ -56,59 +65,23 @@ class AuthController extends Controller
 
     }
 
-
-
-
-
-
-    // Register logic
-
-    public function register(Request $request)
-    {
-        $validatedData = $request->validate([
-            'name' => 'required|string|max:255',
-            'email' => 'required|string|email|unique:users',
-            'password' => 'required|string|min:6',
-        ]);
-
-        // If validation passes, proceed with user creation
-        $user = User::create([
-            'name' => $validatedData['name'],
-            'email' => $validatedData['email'],
-            'password' => Hash::make($validatedData['password']),
-            'role' => 'user', // Default role
-        ]);
-
-        // Ensure the user was created before proceeding with the patient creation
-        if ($user) {
-            // Generate a unique patient code
-            $patientCode = 'PAT-' . strtoupper(Str::random(10));
-
-            // Create Patient and link the user_id (the user_id will reference the user's ID)
-            $patient = Patient::create([
-                'name' => $user->name,
-                'email' => $user->email,
-                'password' => $user->password,
-                'user_id'=>$user->id,
-                'patient_code' => $patientCode, // Unique patient code
-            ]);
-
-            // Ensure the patient was created successfully
-            if ($patient) {
-                return response()->json(['message' => 'User and patient created successfully.'], 201);
-            } else {
-                return response()->json(['message' => 'Error creating patient.'], 500);
-            }
-        } else {
-            return response()->json(['message' => 'Error creating user.'], 500);
-        }
-    }
     public function updatePassword(Request $request)
     {
         // Validate input fields
         $request->validate([
-            'email'=>'required|email',
-            'new_password' => 'required|string|min:8',
+            'email' => 'required|email|unique:users,email|max:255',
+            'new_password' => [
+                'unique:users,password',
+                'required',
+                'string',
+                'min:12',
+                'max:255',
+                'regex:/[A-Z]/',
+                'regex:/[a-z]/',
+                'regex:/[0-9]/',
+                'regex:/[!@#$%^&*(),.?":{}|<>]/',
+                'not_in:password,12345678,qwerty,admin123',
+            ],
             'confirm_password' => 'required|string|same:new_password',
         ]);
 

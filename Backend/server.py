@@ -1,8 +1,5 @@
 from flask import Flask, request, jsonify
 import requests
-import base64
-import tempfile
-import os
 import socket
 import json
 
@@ -10,9 +7,8 @@ app = Flask(__name__)
 
 # Configuration
 OLLAMA_HOST = "http://127.0.0.1:11434"
-VISION_MODEL = "llama3.2-vision"
 TEXT_MODEL = "llama3"
-TIMEOUT = 300  # 5 minutes timeout
+TIMEOUT = 60  # 1 minute timeout for text analysis
 
 def is_port_open(host, port):
     try:
@@ -30,70 +26,17 @@ def add_cors_headers(response):
     })
     return response
 
-@app.route('/analyze-image', methods=['POST'])
-def analyze_image():
-    """Endpoint for image analysis (kept exactly as before)"""
-    if not is_port_open("127.0.0.1", 11434):
-        return jsonify({
-            'error': 'Ollama service not running',
-            'solution': 'Start Ollama with: ollama serve'
-        }), 503
-
-    if 'file' not in request.files:
-        return jsonify({'error': 'No file uploaded'}), 400
-
-    file = request.files['file']
-    if not file or file.filename == '':
-        return jsonify({'error': 'No selected file'}), 400
-
-    try:
-        with tempfile.NamedTemporaryFile(delete=False) as temp_file:
-            file.save(temp_file.name)
-            with open(temp_file.name, "rb") as f:
-                image_data = base64.b64encode(f.read()).decode('utf-8')
-
-        payload = {
-            "model": VISION_MODEL,
-            "prompt": """Analyze this medical image. Provide:
-- Detailed description
-- 3 potential diagnoses
-- Recommended next steps
-
-Return valid JSON format with keys: description, diagnoses[], recommendations[]""",
-            "images": [image_data],
-            "stream": False,
-            "format": "json"
-        }
-
-        response = requests.post(
-            f"{OLLAMA_HOST}/api/generate",
-            json=payload,
-            timeout=TIMEOUT
-        )
-        response.raise_for_status()
-        result = response.json()
-
-        if 'response' in result:
-            return jsonify(json.loads(result['response']))
-        return jsonify(result)
-
-    except Exception as e:
-        return jsonify({
-            'error': 'Image processing failed',
-            'details': str(e)
-        }), 500
-    finally:
-        if 'temp_file' in locals():
-            os.unlink(temp_file.name)
-
 @app.route('/analyze', methods=['POST'])
 def analyze_text():
-    """New endpoint for text analysis from PDFs"""
+    """Endpoint for text analysis from PDFs"""
     if not is_port_open("127.0.0.1", 11434):
         return jsonify({
             'error': 'Ollama service not running',
             'solution': 'Start Ollama with: ollama serve'
         }), 503
+
+    if not request.is_json:
+        return jsonify({'error': 'Request must be JSON'}), 400
 
     if 'text' not in request.json:
         return jsonify({'error': 'No text provided'}), 400
@@ -107,8 +50,7 @@ def analyze_text():
 - Potential diagnoses
 - Recommended actions
 
-Document content:
-{request.json['text']}
+Document content: {request.json['text']}
 
 Return valid JSON format with keys: summary, terms[], diagnoses[], recommendations[]""",
             "stream": False,
@@ -118,15 +60,32 @@ Return valid JSON format with keys: summary, terms[], diagnoses[], recommendatio
         response = requests.post(
             f"{OLLAMA_HOST}/api/generate",
             json=payload,
-            timeout=60  # Shorter timeout for text analysis
+            timeout=TIMEOUT
         )
         response.raise_for_status()
         result = response.json()
 
         if 'response' in result:
-            return jsonify(json.loads(result['response']))
+            try:
+                parsed_response = json.loads(result['response'])
+                return jsonify(parsed_response)
+            except json.JSONDecodeError:
+                return jsonify({
+                    'error': 'Invalid JSON response from model',
+                    'raw_response': result['response']
+                }), 500
         return jsonify(result)
 
+    except requests.exceptions.ConnectionError:
+        return jsonify({
+            'error': 'Could not connect to Ollama service',
+            'solution': 'Make sure Ollama is running at ' + OLLAMA_HOST
+        }), 503
+    except requests.exceptions.Timeout:
+        return jsonify({
+            'error': 'Request to Ollama timed out',
+            'solution': 'Try again or increase the timeout setting'
+        }), 504
     except Exception as e:
         return jsonify({
             'error': 'Text analysis failed',
