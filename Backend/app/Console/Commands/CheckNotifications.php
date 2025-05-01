@@ -30,5 +30,7 @@ class CheckNotifications extends Command
         $this->info("{$count} notifications ont été traitées.");
         return Command::SUCCESS;
 
+
     }
+    
 }

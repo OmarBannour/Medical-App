@@ -80,7 +80,10 @@ Route::middleware('auth:sanctum')->post('/analyze-pdf', [PdfController::class, '
 Route::middleware('auth:sanctum')->get('/patients/females' , [PatientController::class , 'getfemalePatients']);
 Route::middleware('auth:sanctum')->get('/patients/males' , [PatientController::class , 'getmalePatients']);
  // charts Routes
-Route::middleware('auth:sanctum')->get('/patients/NumberEvolution', [PatientController::class, 'patientEvolution']);
+Route::middleware('auth:sanctum')->get('/patients/NumberEvolution', [PatientController::class, 'patientEvolutionMonthly']);
+Route::middleware('auth:sanctum')->get('/patients/NumberEvolutionYearly', [PatientController::class, 'patientEvolutionYearly']);
+Route::middleware('auth:sanctum')->get('/patients/NumberEvolutionDaily', [PatientController::class, 'patientEvolutionDaily']);
+Route::middleware('auth:sanctum')->get('/patients/NumberEvolutionWeekly', [PatientController::class, 'patientEvolutionWeekly']);
 Route::middleware('auth:sanctum')->get('/notifications/NumberEvolution', [Notification::class, 'appointmentEvolution']);
 
 //EGC routes

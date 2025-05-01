@@ -27,9 +27,20 @@ class ResetPasswordController extends Controller
     public function resetPassword(Request $request)
     {
         $request->validate([
-            'email' => 'required|email',
             'token' => 'required',
-            'password' => 'required|min:8|confirmed',
+            'email' => 'required|email|unique:users,email|max:255',
+            'password' => [
+                'unique:users,password',
+                'required',
+                'string',
+                'min:12',
+                'max:255',
+                'regex:/[A-Z]/',
+                'regex:/[a-z]/',
+                'regex:/[0-9]/',
+                'regex:/[!@#$%^&*(),.?":{}|<>]/',
+                'not_in:password,12345678,qwerty,admin123',
+            ],
         ]);
 
         $status = Password::reset(

@@ -110,7 +110,7 @@ class PatientController extends Controller
         return response()->json($male);
 }
 
-public function patientEvolution(){
+public function patientEvolutionMonthly(){
     $data= Patient::selectRaw('MONTH(created_at) as month, COUNT(*) as count')
     ->groupBy('month')
     ->orderBy('month')
@@ -119,4 +119,30 @@ public function patientEvolution(){
     return response()->json($data);
 
 }
+
+    public function patientEvolutionYearly(){
+        $data= Patient::selectRaw('YEAR(created_at) as year, COUNT(*) as count')
+        ->groupBy('year')
+        ->orderBy('year')
+        ->get();
+
+        return response()->json($data);
+
+    }
+    public function patientEvolutionDaily() {
+        return Patient::selectRaw('DATE(created_at) as date, COUNT(*) as count')
+            ->whereDate('created_at', '>=', now()->subDays(7))
+            ->groupBy('date')
+            ->orderBy('date')
+            ->get();
+    }
+    public function patientEvolutionWeekly(){
+        $data= Patient::selectRaw('WEEK(created_at) as week, COUNT(*) as count')
+        ->groupBy('week')
+        ->orderBy('week')
+        ->get();
+
+        return response()->json($data);
+
+    }
 }
