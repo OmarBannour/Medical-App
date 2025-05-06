@@ -5,6 +5,9 @@ namespace App\Http\Controllers;
 use App\Models\Notification;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use App\Notifications\AppointmentNotification;
+use App\Http\Controllers\Patient;
+use App\Models\Patient as ModelsPatient;
 
 class NotificationController extends Controller
 {
@@ -137,6 +140,9 @@ class NotificationController extends Controller
 
 
         $notification = Notification::create($validate);
+        $patient = ModelsPatient::find($request->patient_id);
+        $patient->notify(new AppointmentNotification( $notification, Auth::user()));
+
 
         return response()->json($notification, 201);
     }
@@ -147,11 +153,31 @@ class NotificationController extends Controller
         return response()->json(null, 204);
     }
 // chart data for the appointment evolution
-    public function appointmentEvolution()
+    public function appointmentEvolutionMonthly()
 {
-    $data = Notification::selectRaw('MONTH(date) as month, COUNT(*) as count')
+    $data = Notification::selectRaw('MONTH(due_date) as month, COUNT(*) as count')
         ->groupBy('month')
         ->orderBy('month')
+        ->get();
+
+    return response()->json($data);
+}
+// chart data for appointment evolution by year
+public function appointmentEvolutionByYear()
+{
+    $data = Notification::selectRaw('YEAR(due_date) as year, COUNT(*) as count')
+        ->groupBy('year')
+        ->orderBy('year')
+        ->get();
+
+    return response()->json($data);
+}
+// chart data for appointment evolution by week
+public function appointmentEvolutionByWeek()
+{
+    $data = Notification::selectRaw('WEEK(due_date) as week, COUNT(*) as count')
+        ->groupBy('week')
+        ->orderBy('week')
         ->get();
 
     return response()->json($data);

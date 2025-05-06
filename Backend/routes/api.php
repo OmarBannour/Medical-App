@@ -30,6 +30,7 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     Route::middleware('auth:sanctum')->get('/documents/EGC/count', [MedicalDocumentController::class, 'EGCCount']);
     Route::middleware('auth:sanctum')->get('/documents/Report/count', [MedicalDocumentController::class, 'ReportCount']);
     Route::middleware('auth:sanctum')->get('/documents/lab_result/count', [MedicalDocumentController::class, 'LabResultCount']);
+    Route::middleware('auth:sanctum')->get('/documents/{id}/GetContent', [MedicalDocumentController::class, 'getContent']);
 
 
 
@@ -84,9 +85,14 @@ Route::middleware('auth:sanctum')->get('/patients/NumberEvolution', [PatientCont
 Route::middleware('auth:sanctum')->get('/patients/NumberEvolutionYearly', [PatientController::class, 'patientEvolutionYearly']);
 Route::middleware('auth:sanctum')->get('/patients/NumberEvolutionDaily', [PatientController::class, 'patientEvolutionDaily']);
 Route::middleware('auth:sanctum')->get('/patients/NumberEvolutionWeekly', [PatientController::class, 'patientEvolutionWeekly']);
-Route::middleware('auth:sanctum')->get('/notifications/NumberEvolution', [Notification::class, 'appointmentEvolution']);
+Route::middleware('auth:sanctum')->get('/notifications/NumberEvolutionMonthly', [NotificationController::class, 'appointmentEvolutionMonthly']);
+Route::middleware('auth:sanctum')->get('/notifications/NumberEvolutionYearly', [NotificationController::class, 'appointmentEvolutionByYear']);
+Route::middleware('auth:sanctum')->get('/notifications/NumberEvolutionWeekly', [NotificationController::class, 'appointmentEvolutionByWeek']);
+// fileter routes for medical documents
 
-//EGC routes
+Route::middleware('auth:sanctum')->get('/documents/filterByweek', [MedicalDocumentController::class, 'DocumentsByweek']);
+Route::middleware('auth:sanctum')->get('/documents/filterByMonth', [MedicalDocumentController::class, 'DocumentsByMonth']);
+Route::middleware('auth:sanctum')->get('/documents/filterByYear', [MedicalDocumentController::class, 'DocumentsByYear']);
 
 
 

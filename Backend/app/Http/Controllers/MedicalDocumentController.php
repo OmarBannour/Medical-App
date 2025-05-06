@@ -6,9 +6,7 @@ use Illuminate\Http\Request;
 use App\Models\MedicalDocument;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
-
-
-
+use Carbon\Carbon;
 use function storage_path;
 
 
@@ -217,4 +215,54 @@ public function LabResultCount()
             ], 500);
         }
     }
+
+    //see the content of the medical recored
+
+ public function getContent($id)
+ {
+    $document=MedicalDocument::findOrFail($id);
+    $path=storage_path("app/public/{$document->file_path}");
+    if (!file_exists($path)){
+        return response()->json(['message'=>'Fichier non trouvé'],404);
+    }
+    $mime=mime_content_type($path);
+    $content=file_get_contents($path);
+   return response()->json([
+    'content' => base64_encode($content),
+        'mime_type' => $mime,
+        'file_name' => $document->file_name
+
+   ]);
+
+
+
+
+
+
+
+ }
+ // function to filter the documents by type
+ public function filterByType()
+ {
+  $documents=MedicalDocument::where('type','Report')->get();
+  return response()->json($documents);
+
+ }
+
+ // function to filter the documents by date
+public function DocumentsByweek()
+{
+    $documents=MedicalDocument::whereBetween('created_at', [Carbon::now()->startOfWeek(), Carbon::now()->endOfWeek()])->get();
+    return response()->json($documents);
+}
+public function DocumentsByMonth()
+{
+    $documents=MedicalDocument::whereMonth('created_at', Carbon::now()->month)->get();
+    return response()->json($documents);
+}
+public function DocumentsByYear()
+{
+    $documents=MedicalDocument::whereYear('created_at', Carbon::now()->year)->get();
+    return response()->json($documents);
+}
 }

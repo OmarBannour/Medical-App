@@ -6,11 +6,13 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Laravel\Sanctum\HasApiTokens;
 use App\Models\MedicalDocument;
+use Illuminate\Notifications\Notifiable;
 
 class Patient extends Model
 {
     use HasFactory;
     use HasApiTokens;
+    use Notifiable;
     protected $fillable = [
         'name',
         'gender',
