@@ -44,15 +44,17 @@ def analyze_text():
     try:
         payload = {
             "model": TEXT_MODEL,
-            "prompt": f"""Analyze this medical document. Provide:
-- Key findings and summary
-- Important medical terms
-- Potential diagnoses
-- Recommended actions
+            "prompt": f"""You are a skilled medical document analyst. Review the following medical document carefully and provide a comprehensive analysis.
+INSTRUCTIONS:
+1. analyse the document and say what the patient has as a sickness.
+2. Identify and explain all critical medical terms, abbreviations, and values with their significance.
+3. Recommend specific next steps, follow-up actions, or additional tests if needed.
+4. Highlight any urgent concerns or red flags that require immediate attention.
+
 
 Document content: {request.json['text']}
 
-Return valid JSON format with keys: summary, terms[], diagnoses[], recommendations[]""",
+Return valid JSON format with keys : summary: ,  recommendations: , in single paragraphs.""",
             "stream": False,
             "format": "json"
         }

@@ -18,6 +18,7 @@ class MedicalDocumentController extends Controller
             // Validate the request
             $request->validate([
                 'title' => 'required|string|max:255',
+                'summary' => 'nullable|string|max:500',
                 'type' => 'required|string|max:50',
                 'file' => 'required|file|mimes:jpg,jpeg,png,pdf,docx,xlsx',
                 'user_id' => 'required|exists:users,id'
@@ -34,6 +35,7 @@ class MedicalDocumentController extends Controller
             // Create the document record
             $document = MedicalDocument::create([
                 'title' => $request->input('title'),
+                'summary' => $request->input('summary'),
                 'type' => $request->input('type'),
                 'file_path' => $path,
                 'user_id' => $request->input('user_id')
@@ -105,7 +107,8 @@ class MedicalDocumentController extends Controller
                     ->orWhereIn('user_id', function ($query) use ($user) {
                         $query->select('user_id')->from('patients')->where('patients.user_id', $user->id);
                     })
-                    ->get();
+                    ->paginate(10);
+                    return $documents->toArray();
             }
 
             return response()->json($documents);
@@ -242,11 +245,19 @@ public function LabResultCount()
 
  }
  // function to filter the documents by type
- public function filterByType()
+ public function filterReport()
  {
-  $documents=MedicalDocument::where('type','Report')->get();
-  return response()->json($documents);
+  $documents=MedicalDocument::where('type','Report')->paginate(10);
+  return $documents->toArray();
 
+ }
+ public function filterEGC(){
+    $documents=MedicalDocument::where('type','EGC')->paginate(10);
+    return $documents->toArray();
+ }
+ public function filterLabResult(){
+    $documents=MedicalDocument::where('type','Lab Result')->paginate(10);
+    return $documents->toArray();
  }
 
  // function to filter the documents by date

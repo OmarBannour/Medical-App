@@ -11,6 +11,8 @@ use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\DB;
 
 class UserController extends Controller
 {
@@ -22,8 +24,8 @@ class UserController extends Controller
 
     {
         $this->authorize('view-user');
-        $User = User::all();
-        return $User;
+        $User = User::paginate(10);
+        return $User->toArray();
     }
 
 
@@ -143,4 +145,7 @@ class UserController extends Controller
         $User->delete();
         return response()->json(null, 204);
     }
+
+// Get Doctor name
+
 }

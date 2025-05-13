@@ -11,27 +11,6 @@ class NotificationService
 {
    // create a notification for an upcoming exam
 
-   public function createExamReminder(Patient $patient, $examType, Carbon $examDate, $additionalDetails = []){
-
-
-    // claculer la date de notification (3j avant l'examen)
-    $notificationDate= $examDate->copy()->subDays(3);
-    Notification::create([
-        'patient_id'=>$patient->id,
-        'type'=>'exam',
-        'title'=>"Reminder about an :{$examType} exam",
-       'message' => "the patient {$patient->name}  should make  {$examType} exam in " . $examDate->format('d/m/Y'),
-       'due_date'=>$notificationDate,
-       'is_critical'=>false,
-       'details'=> array_merge([
-        'exam_type'=>$examType,
-        'exam_date'=>$examDate->toDateTimeString()
-       ], $additionalDetails)
-    ]);
-   }
-
-   // create a notification about a bilan routine
-
    public function createRoutineCheckupReminder(Patient $patient, $frequency = 'annuel', $additionalDetails = []){
 
     $now = Carbon::now();
@@ -84,9 +63,6 @@ class NotificationService
            ->get();
 
            foreach ($pendingNotification as $notification) {
-            // Ici, vous pourriez implémenter l'envoi par email ou SMS
-            // Pour l'instant, nous allons juste marquer les notifications comme "à traiter"
-            // Cette méthode serait appelée par une tâche planifiée
 
             $notification->details = array_merge(
                 $notification->details ?: [],

@@ -12,6 +12,7 @@ use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\PdfController;
 use App\Models\Notification;
 use App\Http\Controllers\EcgController;
+use App\Http\Controllers\DoctorController;
 
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
@@ -42,6 +43,7 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     Route::middleware('auth:sanctum')->put('/users/{id}/update', [UserController::class, 'update']);
     Route::middleware('auth:sanctum')->delete('/users/{id}/delete', [UserController::class, 'destroy']);
 
+
     // Forgot Password Route (Request Reset Link)
 Route::post('/forgot-password', [ResetPasswordController::class, 'sendResetLinkEmail']);
 
@@ -71,6 +73,14 @@ Route::middleware('auth:sanctum')->get('/patients/count', [PatientController::cl
     Route::middleware('auth:sanctum')->get('/notifications/appointment-count', [NotificationController::class, 'CountAppointmentNotification']);
     Route::middleware('auth:sanctum')->get('/notifications/today_appointment', [NotificationController::class, 'TodayAppointment']);
 
+    Route::middleware('auth:sanctum')->get('/notifications/appointment', [NotificationController::class, 'AppointmentNotification']);
+    Route::middleware('auth:sanctum')->get('/notifications/reminder', [NotificationController::class, 'ReminderNotification']);
+    Route::middleware('auth:sanctum')->get('/notifications/medication', [NotificationController::class, 'MedicationNotification']);
+
+
+    Route::middleware('auth:sanctum')->get('/notifications/critical', [NotificationController::class, 'CriticalNotifications']);
+    Route::middleware('auth:sanctum')->get('/notifications/non-critical', [NotificationController::class, 'NonCriticalNotifications']);
+
 
 
 Route::middleware('auth:sanctum')->post('/analyze-pdf', [PdfController::class, 'analyzePdf']);
@@ -94,8 +104,14 @@ Route::middleware('auth:sanctum')->get('/documents/filterByweek', [MedicalDocume
 Route::middleware('auth:sanctum')->get('/documents/filterByMonth', [MedicalDocumentController::class, 'DocumentsByMonth']);
 Route::middleware('auth:sanctum')->get('/documents/filterByYear', [MedicalDocumentController::class, 'DocumentsByYear']);
 
+Route::middleware('auth:sanctum')->get('/documents/filterEGC', [MedicalDocumentController::class, 'filterEGC']);
+Route::middleware('auth:sanctum')->get('/documents/filterReport', [MedicalDocumentController::class, 'filterReport']);
+Route::middleware('auth:sanctum')->get('/documents/filterLabResult', [MedicalDocumentController::class, 'filterLabResult']);
+
+Route::post('/ecg/predict', [App\Http\Controllers\EcgController::class, 'predict']);
 
 
+Route::get('/doctors', [DoctorController::class, 'index']);
 
 
 

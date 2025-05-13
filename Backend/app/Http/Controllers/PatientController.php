@@ -6,15 +6,14 @@ use Illuminate\Http\Request;
 use App\Models\Patient;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Log;
-
-
+use PhpParser\Node\Stmt\Return_;
 
 class PatientController extends Controller
 {
     public function index()
     {
-        $patients = Patient::all();
-        return $patients;
+      $patients = Patient::paginate(10);
+      return $patients->toArray();
     }
 
     public function countAll()
@@ -85,6 +84,8 @@ class PatientController extends Controller
             "gender" => "sometimes|string",
             "birthday" => "sometimes|date",
             "country" => "sometimes|string",
+            "email" => "sometimes|email",
+            "name" => "sometimes|string|max:255",
         ]);
         $update= $patient->update($validateData);
         return $patient;
@@ -101,14 +102,17 @@ class PatientController extends Controller
 
     // function to get the patients by gender
     public function getfemalePatients(){
-        $female=Patient::where('gender' , 'female')->get();
-        return response()->json($female);
+        $female=Patient::where('gender' , 'female')->paginate(10); 
+        return $female->toArray();
     }
 
-    public function getmalePatients(){
-        $male=Patient::where('gender','male')->get();
-        return response()->json($male);
+    public function getMalePatients()
+{
+    $malePatients = Patient::where('gender', 'male')->paginate(10);
+    return response()->json($malePatients);
 }
+
+
 
 public function patientEvolutionMonthly(){
     $data= Patient::selectRaw('MONTH(created_at) as month, COUNT(*) as count')

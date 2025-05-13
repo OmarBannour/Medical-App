@@ -15,6 +15,9 @@ return new class extends Migration
         Schema::create('users', function (Blueprint $table) {
             $table->id(); // Laravel automatically creates an `id` column as BIGINT UNSIGNED
             $table->string('token')->nullable();
+            $table->string('token_expires_at')->nullable();
+            $table->string('otp_code')->nullable();
+            $table->timestamp('otp_expires_at')->nullable();
             $table->boolean('must_change_password')->default(true);
             $table->string('name');
             $table->string('email')->unique();

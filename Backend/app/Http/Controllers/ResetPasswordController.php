@@ -9,12 +9,21 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Password;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Mail;
 
 class ResetPasswordController extends Controller
 {
     public function sendResetLinkEmail(Request $request)
     {
         $request->validate(['email' => 'required|email']);
+        $user = User::where('email', $request->email)->first();
+        if (!$user) {
+            return response()->json(['error' => 'User not found'], 404);
+        }
+
+
+
+
 
         $status = Password::sendResetLink($request->only('email'));
 
@@ -28,7 +37,8 @@ class ResetPasswordController extends Controller
     {
         $request->validate([
             'token' => 'required',
-            'email' => 'required|email|unique:users,email|max:255',
+
+            'email' => 'required|email|max:255',
             'password' => [
                 'unique:users,password',
                 'required',
@@ -42,6 +52,10 @@ class ResetPasswordController extends Controller
                 'not_in:password,12345678,qwerty,admin123',
             ],
         ]);
+
+
+
+
 
         $status = Password::reset(
             $request->only('email', 'password', 'password_confirmation', 'token'),

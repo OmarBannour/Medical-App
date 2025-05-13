@@ -24,6 +24,7 @@ class Patient extends Model
         'password',
         'patient_code',
         'user_id',
+        
 
 
 

@@ -10,66 +10,58 @@ use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\RateLimiter;
+use Illuminate\Support\Facades\DB;
 
 
 
 class AuthController extends Controller
 {
     public function login(Request $request)
-    {
-        // Validate input fields
-        $credentials = $request->validate([
-            'email' => 'required|string|email',
-            'password' => 'required|string',
-        ]);
+{
+    $credentials = $request->validate([
+        'email' => 'required|string|email',
+        'password' => 'required|string',
+    ]);
 
-        if (RateLimiter::tooManyAttempts('login:'.$request->ip(), 5)) {
-            return response()->json([
-                'message' => 'Too many login attempts. Please try again later.',
-            ], 429);
-        }
-
-        RateLimiter::hit('login:'.$request->ip());
-
-
-        // Find user by email
-        $user = User::where('email', $credentials['email'])->first();
-
-        if (!$user) {
-            return response()->json(['message' => 'This email is not registered.'], 404);
-        }
-
-        // Check if password matches
-        if (!Hash::check($credentials['password'], $user->password)) {
-            return response()->json(['message' => 'The password is incorrect.'], 401);
-        }
-
-        // Check if the user must change their password
-        // Only check this if the flag is true and it isn't the first login
-        if ($user->must_change_password) {
-            return response()->json([
-                'message' => 'You need to change your password.',
-                'must_change_password' => true,  // Flag indicating password change is required
-            ], 200);
-        }
-
-        // If no password change is required, create a token
-        $token = $user->createToken('AuthToken')->plainTextToken;
-
+    // Rate limiting
+    if (RateLimiter::tooManyAttempts('login:'.$request->ip(), 5)) {
         return response()->json([
-            'message' => 'Login successful',
-            'token' => $token,
-            'user' => $user
-        ], 200);
-
-
+            'message' => 'Too many login attempts. Please try again later.',
+        ], 429);
     }
+
+    $user = User::where('email', $credentials['email'])->first();
+
+    if (!$user || !Hash::check($credentials['password'], $user->password)) {
+        RateLimiter::hit('login:'.$request->ip());
+        return response()->json(['message' => 'Invalid credentials'], 401);
+    }
+
+    if ($user->must_change_password) {
+        return response()->json([
+            'message' => 'Password change required',
+            'must_change_password' => true,
+        ], 200);
+    }
+
+    // Create token with 2 minute expiration
+    $token = $user->createToken('AuthToken', ['*'], now()->addMinutes(60))->plainTextToken;
+    $user->token = $token;
+    $user->save();
+
+    return response()->json([
+        'message' => 'Login successful',
+        'token' => $token,
+        'token_expires_at' => now()->addMinutes(2)->toDateTimeString(), // Send expiration time
+        'user' => $user
+    ], 200);
+}
 
     public function updatePassword(Request $request)
     {
         // Validate input fields
         $request->validate([
-            'email' => 'required|email|unique:users,email|max:255',
+            'email' => 'required|email|max:255',
             'new_password' => [
                 'unique:users,password',
                 'required',
@@ -100,6 +92,7 @@ class AuthController extends Controller
         // Create token for authentication
         $token = $user->createToken('AuthToken')->plainTextToken;
 
+
         return response()->json([
             'message' => 'Password updated successfully',
             'token' => $token,
@@ -110,7 +103,9 @@ class AuthController extends Controller
     public function logout(Request $request)
     {
         // Revoke user's tokens
-        $request->user()->tokens()->delete();
+       $token = User::where('token', $request->token)->first();
+       $token->token = null;
+       $token->save();
 
         return response()->json([
             'message' => 'Logged out successfully'

@@ -20,33 +20,10 @@ class NotificationController extends Controller
 
         $query  = Notification::where('user_id', $user->id);
 
-        // filtrage par type si specifié
-        if ($request->filled('type')) {
-            $query->where('type', $request->type);
-        }
+         $notification= Notification::paginate(10);
+         return $notification->toArray();
 
-        //filtrage with satuts read/no read
 
-        if ($request->filled('read')) {
-            $isRead = filter_var($request->read, FILTER_VALIDATE_BOOLEAN);
-            if ($isRead) {
-                $query->whereNotNull('read_at');
-            } else {
-                $query->whereNull('read_at');
-            }
-        }
-
-        if ($request->filled('critical')) {
-            $isCritical = filter_var($request->critical, FILTER_VALIDATE_BOOLEAN);
-            $query->where('is_critical', $isCritical);
-        }
-
-        $perPage = $request->get('per_page', 20); // Default to 20 if not provided
-        $notifications = $query->orderBy('is_critical', 'desc')
-            ->orderBy('created_at', 'desc')
-            ->paginate($perPage);
-
-        return response()->json($notifications, 200);
     }
 
     // marke a notification as read
@@ -182,4 +159,34 @@ public function appointmentEvolutionByWeek()
 
     return response()->json($data);
 }
+
+
+public function AppointmentNotification()
+{
+    $notification = Notification::where('type', 'appointment')->paginate(10);
+    return $notification->toArray();
+}
+
+
+ public function ReminderNotification()
+ {
+    $notification = Notification::where('type', 'reminder')->paginate(10);
+    return $notification->toArray();
+ }
+
+ public function MedicationNotification()
+ {
+    $notification = Notification::where('type', 'medication')->paginate(10);
+    return $notification->toArray();
+ }
+
+ public function CriticalNotifications(){
+    $notification =Notification::where('is_critical', true)->paginate(10);
+    return $notification->toArray();
+ }
+
+ public function NonCriticalNotifications(){
+    $notification =Notification::where('is_critical', false)->paginate(10);
+    return $notification->toArray();
+ }
 }
