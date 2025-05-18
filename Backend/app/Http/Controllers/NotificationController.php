@@ -49,7 +49,7 @@ class NotificationController extends Controller
     {
 
         $count = Notification::where('type', 'appointment')
-            ->whereNull('read_at')
+            
             ->count();
 
         return response()->json($count);

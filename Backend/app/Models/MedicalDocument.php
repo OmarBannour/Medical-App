@@ -9,7 +9,7 @@ use App\Models\Patient;
 class MedicalDocument extends Model
 {
     use HasFactory;
-    protected $fillable = ['title', 'file_path', 'type', 'user_id','summary'];
+    protected $fillable = ['title', 'file_path', 'type', 'patient_id','summary'];
 
     public function patient(){
         return $this->belongsTo(Patient::class);

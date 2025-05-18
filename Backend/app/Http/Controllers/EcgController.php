@@ -42,9 +42,7 @@ class EcgController extends Controller
 
             // Return the prediction results
             return response()->json([
-                'prediction' => $result['prediction'] ?? null,
-                'confidence' => $result['confidence'] ?? null,
-                'probabilities' => $result['probabilities'] ?? null,
+                'interpretation' => $result['interpretation'] ?? null
             ]);
 
         } catch (\Exception $e) {

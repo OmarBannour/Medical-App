@@ -54,25 +54,8 @@ class NotificationService
 
 
     }
-      //verify and send the pending notification
 
-      public function sendPendingNotifications(){
 
-        $pendingNotification = Notification::whereNull('read_at')
-           ->whereDate('due_date', '<=' , Carbon::now())
-           ->get();
-
-           foreach ($pendingNotification as $notification) {
-
-            $notification->details = array_merge(
-                $notification->details ?: [],
-                ['notification_sent' => true, 'sent_at' => Carbon::now()->toDateTimeString()]
-            );
-            $notification->save();
-        }
-
-        return $pendingNotification->count();
-      }
    }
 
 

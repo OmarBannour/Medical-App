@@ -103,6 +103,7 @@ Route::middleware('auth:sanctum')->get('/notifications/NumberEvolutionWeekly', [
 Route::middleware('auth:sanctum')->get('/documents/filterByweek', [MedicalDocumentController::class, 'DocumentsByweek']);
 Route::middleware('auth:sanctum')->get('/documents/filterByMonth', [MedicalDocumentController::class, 'DocumentsByMonth']);
 Route::middleware('auth:sanctum')->get('/documents/filterByYear', [MedicalDocumentController::class, 'DocumentsByYear']);
+Route::middleware('auth:sanctum')->get('/documents/ShowDocumentSummary/{id}', [MedicalDocumentController::class, 'ShowDocumentSummary']);
 
 Route::middleware('auth:sanctum')->get('/documents/filterEGC', [MedicalDocumentController::class, 'filterEGC']);
 Route::middleware('auth:sanctum')->get('/documents/filterReport', [MedicalDocumentController::class, 'filterReport']);
