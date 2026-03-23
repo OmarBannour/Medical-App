@@ -6,7 +6,7 @@ use App\Notifications\NewUserCreated;
 use Illuminate\Http\Request;
 use App\Models\User;
 use App\Models\Patient;
-
+use Illuminate\Container\Attributes\Auth;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
@@ -92,6 +92,37 @@ class UserController extends Controller
         ], 201);
     }
 
+ public function updatePassword(Request $request, string $id) {
+    $request->validate([
+        'currentPassword' => ['required'],
+        'newPassword' => [
+            'required',
+            'string',
+            'min:12',
+            'max:255',
+            'regex:/[A-Z]/',                      // At least one uppercase letter
+            'regex:/[a-z]/',                      // At least one lowercase letter
+            'regex:/[0-9]/',                      // At least one digit
+            'regex:/[!@#$%^&*(),.?":{}|<>]/',     // At least one special character
+            'not_in:password,12345678,qwerty,admin123',
+            'confirmed',                          // Requires `newPassword_confirmation` field
+        ],
+    ]);
+
+    $user = User::findOrFail($id);
+
+    // Check if the current password is correct - FIXED THIS LINE
+    if (!Hash::check($request->currentPassword, $user->password)) {
+        return response()->json(['error' => 'Current password is incorrect.'], 422);
+    }
+
+    // Update password
+    $user->password = Hash::make($request->newPassword);
+    $user->save();
+
+    return response()->json(['message' => 'Password updated successfully.']);
+}
+
 
     public function store(Request $request)
     {
@@ -101,12 +132,12 @@ class UserController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(string $id)
+    public function show()
 
     {
         $this->authorize('view-user');
-        $User=User::find($id);
-        return $User;
+         $user = \Illuminate\Support\Facades\Auth::user();
+        return $user;
     }
 
     /**
@@ -126,6 +157,8 @@ class UserController extends Controller
         $request= request()->validate([
             "name"=>"sometimes|string|max:255",
             "email"=>"sometimes|email",
+            "country"=>"sometimes|string",
+            "phone_number"=>"sometimes|string",
             "password"=>"sometimes|string",
             "role"=>"sometimes|string"
              ]);
@@ -146,6 +179,5 @@ class UserController extends Controller
         return response()->json(null, 204);
     }
 
-// Get Doctor name
 
 }

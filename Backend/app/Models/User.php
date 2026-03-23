@@ -27,6 +27,8 @@ class User extends Authenticatable
         'role',
         'must_change_password',
         'token',
+        'country',
+        'phone_number',
 
     ];
     public function sendPasswordResetNotification($token)

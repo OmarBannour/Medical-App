@@ -39,9 +39,11 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 
     Route::middleware('auth:sanctum')->get('/users', [UserController::class, 'index']);
     Route::middleware('auth:sanctum')->post('/users/create', [UserController::class, 'create']);
-    Route::middleware('auth:sanctum')->get('/users/{id}', [UserController::class, 'show']);
+    Route::middleware('auth:sanctum')->get('/user', [UserController::class, 'show']);
     Route::middleware('auth:sanctum')->put('/users/{id}/update', [UserController::class, 'update']);
     Route::middleware('auth:sanctum')->delete('/users/{id}/delete', [UserController::class, 'destroy']);
+     Route::middleware('auth:sanctum')->put('/users/{id}/update_password', [UserController::class, 'updatePassword']);
+
 
 
     // Forgot Password Route (Request Reset Link)
