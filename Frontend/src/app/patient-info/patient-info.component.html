@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MedCore - Patient Registration</title>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Inter', sans-serif;
+      background-color: #f0f4f8;
+      background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23193366' fill-opacity='0.03'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+    }
+    .form-input-focus:focus {
+      box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.25);
+    }
+    .medical-gradient {
+      background: linear-gradient(135deg, #0061ff 0%, #60efff 100%);
+    }
+    .pulse-animation {
+      animation: pulse 2s infinite;
+    }
+    @keyframes pulse {
+      0% {
+        box-shadow: 0 0 0 0 rgba(59, 130, 246, 0.4);
+      }
+      70% {
+        box-shadow: 0 0 0 10px rgba(59, 130, 246, 0);
+      }
+      100% {
+        box-shadow: 0 0 0 0 rgba(59, 130, 246, 0);
+      }
+    }
+    .hover-lift {
+      transition: transform 0.2s ease-in-out;
+    }
+    .hover-lift:hover {
+      transform: translateY(-2px);
+    }
+  </style>
+</head>
+<body class="bg-gray-50">
+  <app-navbar></app-navbar>
+
+  <div class="min-h-screen flex items-center justify-center px-4 py-12">
+    <div class="w-full max-w-6xl bg-white shadow-2xl rounded-2xl overflow-hidden border border-gray-200 transition-all duration-500 ease-in-out hover:shadow-2xl">
+      <!-- Professional Medical Header -->
+      <header class="medical-gradient text-white px-10 py-8 relative overflow-hidden">
+        <div class="absolute top-0 right-0 w-64 h-64 bg-white opacity-5 rounded-full -mt-16 -mr-16"></div>
+        <div class="absolute bottom-0 left-0 w-32 h-32 bg-white opacity-5 rounded-full -mb-16 -ml-16"></div>
+
+        <div class="flex items-center justify-between relative z-10">
+          <div class="flex items-center space-x-5">
+            <div class="bg-white p-3 rounded-full shadow-lg pulse-animation">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-9 w-9 text-blue-700" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.5v15m7.5-7.5h-15" />
+              </svg>
+            </div>
+            <div>
+              <h2 class="text-3xl font-bold tracking-tight">Patient Profile Registration</h2>
+              <p class="text-blue-100 text-sm mt-2 flex items-center">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+                </svg>
+                MedCore Patient Management System | Secure & Compliant
+              </p>
+            </div>
+          </div>
+          <div class="flex items-center space-x-3">
+            <span class="bg-white text-blue-800 px-4 py-2 rounded-full text-sm font-semibold shadow-md">
+              <i class="fas fa-clipboard-list mr-1"></i> Patient Info
+            </span>
+
+          </div>
+        </div>
+      </header>
+
+      <!-- Form Container with Medical-Themed Styling -->
+      <form #patientForm="ngForm" class="p-10 space-y-8" (ngSubmit)="updatePatientInfo()">
+
+        <!-- Progress Bar -->
+       
+
+        <!-- Personal Information Section -->
+        <div class="bg-green-50 rounded-xl p-6 border-l-4 border-green-500 mb-6 shadow-md hover:shadow-lg transition-all duration-300 ease-in-out">
+          <h3 class="text-xl font-semibold text-green-800 mb-4 flex items-center">
+            <div class="bg-green-100 p-2 rounded-lg mr-3">
+              <i class="fas fa-id-card text-green-600"></i>
+            </div>
+            Personal Information
+          </h3>
+
+          <div class="grid md:grid-cols-2 gap-8 mt-5">
+            <!-- Full Name Field -->
+            <div class="space-y-2">
+              <label for="name" class="block text-sm font-medium text-gray-700 mb-1 flex items-center">
+                <i class="fas fa-user mr-2 text-green-600"></i>
+                Full Name
+                <span class="text-red-500 ml-1">*</span>
+              </label>
+              <div class="relative rounded-md shadow-sm">
+                <input
+                  [(ngModel)]="patient.name"
+                  name="name"
+                  id="name"
+                  type="text"
+                  placeholder="Enter your full name"
+                  class="w-full px-4 py-3.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-all duration-300 ease-in-out form-input-focus"
+                  required
+                  #name="ngModel"
+                />
+                <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
+                  <i class="fas fa-user-check text-gray-400"></i>
+                </div>
+              </div>
+              <div *ngIf="name.invalid && (name.dirty || name.touched)" class="text-red-500 text-xs mt-1 pl-1 flex items-center">
+                <i class="fas fa-exclamation-circle mr-1"></i> Full name is required
+              </div>
+            </div>
+
+            <!-- Email Field -->
+            <div class="space-y-2">
+              <label for="email" class="block text-sm font-medium text-gray-700 mb-1 flex items-center">
+                <i class="fas fa-envelope mr-2 text-green-600"></i>
+                Email Address
+                <span class="text-red-500 ml-1">*</span>
+              </label>
+              <div class="relative rounded-md shadow-sm">
+                <input
+                  [(ngModel)]="patient.email"
+                  name="email"
+                  id="email"
+                  type="email"
+                  placeholder="your.email@example.com"
+                  class="w-full px-4 py-3.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-all duration-300 ease-in-out form-input-focus"
+                  required
+                  pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$"
+                  #email="ngModel"
+                />
+                <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
+                  <i class="fas fa-envelope-open text-gray-400"></i>
+                </div>
+              </div>
+              <div *ngIf="email.invalid && (email.dirty || email.touched)" class="text-red-500 text-xs mt-1 pl-1 flex items-center">
+                <i class="fas fa-exclamation-circle mr-1"></i>
+                <span *ngIf="email.errors?.['required']">Email address is required</span>
+                <span *ngIf="email.errors?.['pattern']">Please enter a valid email address</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Patient Information Section -->
+        <div class="bg-blue-50 rounded-xl p-6 border-l-4 border-blue-500 mb-6 shadow-md hover:shadow-lg transition-all duration-300 ease-in-out">
+          <h3 class="text-xl font-semibold text-blue-800 mb-4 flex items-center">
+            <div class="bg-blue-100 p-2 rounded-lg mr-3">
+              <i class="fas fa-user-circle text-blue-600"></i>
+            </div>
+            Patient Demographics
+          </h3>
+
+          <div class="grid md:grid-cols-2 gap-8 mt-5">
+            <!-- Birthday Field with Enhanced Medical Design -->
+            <div class="space-y-2">
+              <label for="birthday" class="block text-sm font-medium text-gray-700 mb-1 flex items-center">
+                <i class="fas fa-calendar-alt mr-2 text-blue-600"></i>
+                Date of Birth
+                <span class="text-red-500 ml-1">*</span>
+              </label>
+              <div class="relative rounded-md shadow-sm">
+                <input
+                  [(ngModel)]="patient.birthday"
+                  name="birthday"
+                  id="birthday"
+                  type="date"
+                  class="w-full px-4 py-3.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-300 ease-in-out form-input-focus"
+                  required
+                  #birthday="ngModel"
+                />
+                <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                  </svg>
+                </div>
+              </div>
+              <div *ngIf="birthday.invalid && (birthday.dirty || birthday.touched)" class="text-red-500 text-xs mt-1 pl-1 flex items-center">
+                <i class="fas fa-exclamation-circle mr-1"></i> Date of birth is required for medical records
+              </div>
+            </div>
+
+            <!-- Gender Field with Enhanced Medical Design -->
+            <div class="space-y-2">
+              <label for="gender" class="block text-sm font-medium text-gray-700 mb-1 flex items-center">
+                <i class="fas fa-venus-mars mr-2 text-blue-600"></i>
+                Gender
+                <span class="text-red-500 ml-1">*</span>
+              </label>
+              <div class="relative rounded-md shadow-sm">
+                <select
+                  [(ngModel)]="patient.gender"
+                  name="gender"
+                  id="gender"
+                  class="w-full px-4 py-3.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 appearance-none transition-all duration-300 ease-in-out form-input-focus"
+                  required
+                  #gender="ngModel"
+                >
+                  <option value="" class="text-gray-400">Select gender</option>
+                  <option value="male">Male</option>
+                  <option value="female">Female</option>
+                  <option value="other">Other</option>
+                </select>
+                <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                  </svg>
+                </div>
+              </div>
+              <div *ngIf="gender.invalid && (gender.dirty || gender.touched)" class="text-red-500 text-xs mt-1 pl-1 flex items-center">
+                <i class="fas fa-exclamation-circle mr-1"></i> Gender information is required
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Location Information Section -->
+        <div class="bg-indigo-50 rounded-xl p-6 border-l-4 border-indigo-500 mb-6 shadow-md hover:shadow-lg transition-all duration-300 ease-in-out">
+          <h3 class="text-xl font-semibold text-indigo-800 mb-4 flex items-center">
+            <div class="bg-indigo-100 p-2 rounded-lg mr-3">
+              <i class="fas fa-map-marked-alt text-indigo-600"></i>
+            </div>
+            Location Information
+          </h3>
+
+          <!-- City Dropdown with Tunisian Cities -->
+          <div class="space-y-2 mt-5">
+            <label for="city" class="block text-sm font-medium text-gray-700 mb-1 flex items-center">
+              <i class="fas fa-city mr-2 text-indigo-600"></i>
+              City
+              <span class="text-red-500 ml-1">*</span>
+            </label>
+            <div class="relative rounded-md shadow-sm">
+              <select
+                [(ngModel)]="patient.country"
+                name="country"
+                id="country"
+                class="w-full px-4 py-3.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 appearance-none transition-all duration-300 ease-in-out form-input-focus"
+                required
+                #country="ngModel"
+              >
+                <option value="" class="text-gray-400">Select City</option>
+                <option value="Tunis">Tunis</option>
+                <option value="Sfax">Sfax</option>
+                <option value="Sousse">Sousse</option>
+                <option value="Kairouan">Kairouan</option>
+                <option value="Bizerte">Bizerte</option>
+                <option value="Gabès">Gabès</option>
+                <option value="Ariana">Ariana</option>
+                <option value="Gafsa">Gafsa</option>
+                <option value="Monastir">Monastir</option>
+                <option value="Tataouine">Tataouine</option>
+              </select>
+              <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                </svg>
+              </div>
+            </div>
+            <div *ngIf="country.invalid && (country.dirty || country.touched)" class="text-red-500 text-xs mt-1 pl-1 flex items-center">
+              <i class="fas fa-exclamation-circle mr-1"></i> City information is required for assigning local medical facility
+            </div>
+          </div>
+        </div>
+
+        <!-- Action Buttons with Professional Medical Styling -->
+        <div class="flex justify-between items-center pt-6 border-t border-gray-200">
+          <div class="flex items-center text-sm text-gray-500 bg-gray-50 px-4 py-2 rounded-lg">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-blue-500 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+            </svg>
+            Patient data is protected by HIPAA guidelines
+          </div>
+
+          <div class="flex space-x-4">
+            <button
+              type="button"
+              class="px-6 py-3 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all duration-300 ease-in-out flex items-center shadow-sm hover-lift"
+            >
+              <a href="app-welcome" class="flex items-center">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+                </svg>
+                Cancel
+              </a>
+            </button>
+            <button
+              type="submit"
+              class="px-6 py-3 border border-transparent rounded-lg text-sm font-medium text-white medical-gradient hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all duration-300 ease-in-out disabled:opacity-50 disabled:cursor-not-allowed flex items-center shadow-md hover-lift"
+              [disabled]="!patientForm.form.valid"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+              </svg>
+              Save & Continue
+            </button>
+          </div>
+        </div>
+      </form>
+
+      <!-- Privacy Notice -->
+      <div class="bg-gray-50 px-10 py-5 text-sm text-gray-600 border-t border-gray-200">
+        <div class="flex items-center">
+          <div class="bg-blue-100 p-2 rounded-full mr-3">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+          </div>
+          Your personal information is securely stored and processed according to our <a href="#" class="text-blue-600 hover:underline font-medium">Privacy Policy</a> and applicable healthcare regulations. MedCore is fully compliant with international data protection standards.
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Floating Help Button -->
+  <div class="fixed bottom-6 right-6">
+    <button class="bg-white text-blue-600 rounded-full p-4 shadow-lg hover:shadow-xl transition-all duration-300 ease-in-out pulse-animation">
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+      </svg>
+    </button>
+  </div>
+</body>
+</html>

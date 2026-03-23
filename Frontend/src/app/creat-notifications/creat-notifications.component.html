@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MediPro - Patients List</title>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css" rel="stylesheet">
+</head>
+<body class="bg-gradient-to-br from-blue-50 to-indigo-100">
+  <!-- Main container with flex layout -->
+  <div class="flex min-h-screen">
+
+<app-sidebar class="fixed"></app-sidebar>
+<app-header class="fixed top-0 left-0 right-0 h-16 z-10"></app-header>
+    <!-- Main Content with padding to account for fixed sidebar -->
+    <div class="flex-1 ml-60 mt-10">
+      <div class="max-w-7xl mx-auto py-10 px-4 sm:px-6 lg:px-8">
+        <!-- Header with Logo and Navigation -->
+
+        <!-- Main Content -->
+        <div class="bg-white rounded-2xl shadow-xl overflow-hidden border border-gray-100 transform transition-all duration-300 hover:shadow-2xl">
+          <!-- Page Header -->
+          <div class="px-8 py-6 bg-gradient-to-r from-blue-600 to-indigo-600 text-white">
+            <div class="flex justify-between items-center">
+              <div>
+                <h1 class="text-2xl font-bold">Patients List</h1>
+                <p class="text-blue-100 text-sm mt-1">Patient records management dashboard</p>
+              </div>
+              <div class="flex space-x-3">
+                <div class="relative">
+                  <input
+                    type="text"
+                    placeholder="Search patients..."
+                    class="px-4 py-2 pr-8 rounded-lg text-sm bg-white text-gray-800 placeholder-gray-500 border-none focus:outline-none focus:ring-2 focus:ring-blue-300 transition-all duration-200 w-56"
+                    (input)="filterPatients($event)"
+                  />
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-gray-500 absolute right-3 top-2.5" viewBox="0 0 20 20" fill="currentColor">
+                    <path fill-rule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clip-rule="evenodd" />
+                  </svg>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Optional loading indicator -->
+
+
+          <!-- Error message display -->
+          <div *ngIf="errorMessage" class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mt-4 mx-8">
+            <span class="block sm:inline">{{ errorMessage }}</span>
+          </div>
+
+          <div class="bg-indigo-50 px-8 py-4 flex items-center justify-between">
+            <div class="flex items-center space-x-4">
+
+              <!-- Fixed select value binding -->
+              <select class="text-sm bg-white border border-gray-200 rounded-md px-3 py-1.5 focus:outline-none focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 shadow-sm transition-all duration-200" (change)="setFilter($any($event.target).value)">
+                <option value="all">All Genders</option>
+                <option value="male">Male</option>
+                <option value="female">Female</option>
+              </select>
+            </div>
+            <div class="text-sm text-indigo-600 font-medium">
+              <span class="bg-indigo-100 px-2 py-1 rounded text-indigo-700">{{ FilterType === 'all' ? 'All Patients' : FilterType === 'male' ? 'Male Patients' : 'Female Patients' }}</span>
+            </div>
+          </div>
+          <!-- Patient Table -->
+          <div class="overflow-x-auto">
+            <table class="min-w-full divide-y divide-gray-200">
+              <thead class="bg-gray-50 sticky top-0 z-10">
+                <tr>
+                  <th class="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Patient
+                  </th>
+                  <th class="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Gender
+                  </th>
+                  <th class="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Birthday
+                  </th>
+                  <th class="px-6 py-4 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Actions
+                  </th>
+                </tr>
+              </thead>
+              <tbody class="bg-white divide-y divide-gray-200">
+                <tr *ngFor="let patient of patients" class="hover:bg-blue-50 transition-colors duration-200">
+                  <td class="px-6 py-4 whitespace-nowrap">
+                    <div class="flex items-center">
+                      <div class="h-10 w-10 rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center text-white font-medium shadow-sm">
+                        {{ patient?.name?.charAt(0) }}{{ patient?.name?.split(' ')[1]?.charAt(0) || '' }}
+                      </div>
+                      <div class="ml-4">
+                        <div class="text-sm font-medium text-gray-900">{{ patient?.name }}</div>
+                        <div class="text-xs text-gray-500">Patient ID: {{ patient?.id || 'N/A' }}</div>
+                        <div class="text-xs text-gray-500">User ID: {{ patient?.user_id || 'N/A' }}</div>
+                      </div>
+                    </div>
+                  </td>
+                  <td class="px-6 py-4 whitespace-nowrap">
+                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium"
+                          [ngClass]="{'bg-blue-100 text-blue-800': patient?.gender === 'Male',
+                                     'bg-pink-100 text-pink-800': patient?.gender === 'Female',
+                                     'bg-gray-100 text-gray-800': patient?.gender !== 'Male' && patient?.gender !== 'Female'}">
+                      {{ patient?.gender }}
+                    </span>
+                  </td>
+                  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 m">
+                    {{ patient?.birthday || 'No birthday information' }}
+                  </td>
+                  <td class="px-6 py-4 whitespace-nowrap text-sm font-medium flex justify-end">
+                    <button class="inline-flex px-3 py-1.5 border border-transparent text-xs font-medium rounded-md shadow-sm text-white bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition-all duration-200" (click)="openOppointmentModal(patient)">
+                      <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd" d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z" clip-rule="evenodd" />
+                      </svg>
+                      Add Appointment
+                    </button>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <!-- Updated Pagination -->
+        <div class="bg-gray-50 px-8 py-4 flex items-center justify-between border-t border-gray-200">
+          <div class="flex items-center">
+            <p class="text-sm text-gray-700">
+              Showing page <span class="font-medium">{{ curentPage }}</span> of <span class="font-medium">{{ LastPage }}</span>
+            </p>
+          </div>
+          <div class="flex space-x-2">
+            <!-- Previous Page Button -->
+            <button
+              [disabled]="curentPage === 1"
+              (click)="laodPatients(curentPage - 1)"
+              class="px-3 py-1.5 rounded-md border text-gray-500 transition-colors duration-200"
+              [ngClass]="{'bg-gray-100 border-gray-200 cursor-not-allowed': curentPage === 1,
+                         'bg-white border-gray-200 hover:bg-gray-50': curentPage !== 1}">
+              Previous
+            </button>
+
+            <!-- First Page Button (always shown) -->
+            <button
+              (click)="laodPatients(1)"
+              class="px-3 py-1.5 rounded-md border transition-colors duration-200"
+              [ngClass]="{'bg-indigo-600 border-indigo-600 text-white font-medium': curentPage === 1,
+                         'bg-white border-gray-200 text-gray-700 hover:bg-gray-50': curentPage !== 1}">
+              1
+            </button>
+
+            <!-- Ellipsis for large gaps at the start (if needed) -->
+            <span *ngIf="curentPage > 3" class="px-3 py-1.5 text-gray-500">...</span>
+
+            <!-- Page before current (if applicable) -->
+            <button
+              *ngIf="curentPage > 2"
+              (click)="laodPatients(curentPage - 1)"
+              class="px-3 py-1.5 bg-white rounded-md border border-gray-200 text-gray-700 hover:bg-gray-50 transition-colors duration-200">
+              {{ curentPage - 1 }}
+            </button>
+
+            <!-- Current Page (if not first or last) -->
+            <button
+              *ngIf="curentPage !== 1 && curentPage !== LastPage"
+              class="px-3 py-1.5 bg-indigo-600 rounded-md border border-indigo-600 text-white font-medium">
+              {{ curentPage }}
+            </button>
+
+            <!-- Page after current (if applicable) -->
+            <button
+              *ngIf="curentPage < LastPage - 1"
+              (click)="laodPatients(curentPage + 1)"
+              class="px-3 py-1.5 bg-white rounded-md border border-gray-200 text-gray-700 hover:bg-gray-50 transition-colors duration-200">
+              {{ curentPage + 1 }}
+            </button>
+
+            <!-- Ellipsis for large gaps at the end (if needed) -->
+            <span *ngIf="curentPage < LastPage - 2" class="px-3 py-1.5 text-gray-500">...</span>
+
+            <!-- Last Page Button (if not the first page) -->
+            <button
+              *ngIf="LastPage > 1"
+              (click)="laodPatients(LastPage)"
+              class="px-3 py-1.5 rounded-md border transition-colors duration-200"
+              [ngClass]="{'bg-indigo-600 border-indigo-600 text-white font-medium': curentPage === LastPage,
+                         'bg-white border-gray-200 text-gray-700 hover:bg-gray-50': curentPage !== LastPage}">
+              {{ LastPage }}
+            </button>
+
+            <!-- Next Page Button -->
+            <button
+              [disabled]="curentPage === LastPage"
+              (click)="laodPatients(curentPage + 1)"
+              class="px-3 py-1.5 rounded-md border text-gray-500 transition-colors duration-200"
+              [ngClass]="{'bg-gray-100 border-gray-200 cursor-not-allowed': curentPage === LastPage,
+                         'bg-white border-gray-200 hover:bg-gray-50': curentPage !== LastPage}">
+              Next
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+      </div>
+      </div>
+
+
+  <!-- Appointment Modal -->
+  <div *ngIf="openModel" class="fixed inset-0 overflow-y-auto z-50 flex items-center justify-center">
+    <!-- Overlay -->
+    <div class="fixed inset-0 transition-opacity" aria-hidden="true">
+      <div class="absolute inset-0 bg-gray-500 opacity-75"></div>
+    </div>
+
+    <!-- Modal Panel -->
+    <div class="bg-white rounded-lg overflow-hidden shadow-xl transform transition-all sm:max-w-lg sm:w-full">
+      <div class="bg-gradient-to-r from-blue-600 to-indigo-600 px-6 py-4 text-white">
+        <h3 class="text-lg font-medium">Create New Notification for {{ selectedPatient?.name }}</h3>
+      </div>
+
+      <form (ngSubmit)="onSubmit()" class="p-6">
+        <div class="mb-4">
+          <label class="block text-sm font-medium text-gray-700 mb-1">Notification Type</label>
+          <select [(ngModel)]="notification.type" name="type" class="mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+            <option value="">Select a type</option>
+            <option value="appointment">Appointment</option>
+            <option value="medication">Medication</option>
+            <option value="reminder">Reminder</option>
+          </select>
+        </div>
+
+        <div class="mb-4">
+          <label class="block text-sm font-medium text-gray-700 mb-1">Title</label>
+          <input type="text" [(ngModel)]="notification.title" name="title" class="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md" placeholder="Title">
+        </div>
+
+        <div class="mb-4">
+          <label class="block text-sm font-medium text-gray-700 mb-1">Message</label>
+          <textarea [(ngModel)]="notification.message" name="message" rows="3" class="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md" placeholder="Message content"></textarea>
+        </div>
+
+        <div class="mb-4">
+          <label class="block text-sm font-medium text-gray-700 mb-1">Due Date</label>
+          <input type="datetime-local" [(ngModel)]="notification.due_date" name="due_date" class="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md">
+        </div>
+
+        <div class="mb-4 flex items-center">
+          <input id="is_critical" name="is_critical" type="checkbox" [(ngModel)]="notification.is_critical" class="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded">
+          <label for="is_critical" class="ml-2 block text-sm text-gray-700">Mark as Critical</label>
+        </div>
+
+        <div class="flex justify-end space-x-3">
+          <button type="button" (click)="closeFromModal()" class="inline-flex justify-center py-2 px-4 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+            Cancel
+          </button>
+          <button type="submit" class="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+            Create Notification
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</body>
+</html>

@@ -1,0 +1,259 @@
+{
+  "version": "6.0",
+  "nxVersion": "20.5.0",
+  "pathMappings": {},
+  "nxJsonPlugins": [],
+  "fileMap": {
+    "projectFileMap": {},
+    "nonProjectFiles": [
+      {
+        "file": ".editorconfig",
+        "hash": "8037249353422744134"
+      },
+      {
+        "file": ".gitignore",
+        "hash": "10175894702052279752"
+      },
+      {
+        "file": ".vscode/extensions.json",
+        "hash": "11934160580685414355"
+      },
+      {
+        "file": ".vscode/launch.json",
+        "hash": "17406702432687230417"
+      },
+      {
+        "file": ".vscode/tasks.json",
+        "hash": "10093397977228577162"
+      },
+      {
+        "file": "README.md",
+        "hash": "16880515352075167427"
+      },
+      {
+        "file": "angular.json",
+        "hash": "8607353411346908226"
+      },
+      {
+        "file": "ngsw-config.json",
+        "hash": "11051986245655277331"
+      },
+      {
+        "file": "package-lock.json",
+        "hash": "8096226149116215848"
+      },
+      {
+        "file": "package.json",
+        "hash": "9260539042973129781"
+      },
+      {
+        "file": "postcss.config.js",
+        "hash": "17516426545168919416"
+      },
+      {
+        "file": "src/app/animations.ts",
+        "hash": "1916018550090495818"
+      },
+      {
+        "file": "src/app/app.component.css",
+        "hash": "3244421341483603138"
+      },
+      {
+        "file": "src/app/app.component.html",
+        "hash": "5447048747532862818"
+      },
+      {
+        "file": "src/app/app.component.ts",
+        "hash": "2336549752549942095"
+      },
+      {
+        "file": "src/app/app.config.ts",
+        "hash": "14790842209508268602"
+      },
+      {
+        "file": "src/app/app.routes.ts",
+        "hash": "17118073322349962123"
+      },
+      {
+        "file": "src/app/auth.guard.ts",
+        "hash": "9243866900365150092"
+      },
+      {
+        "file": "src/app/dashbored/dashbored.component.html",
+        "hash": "7073416914528914419"
+      },
+      {
+        "file": "src/app/dashbored/dashbored.component.ts",
+        "hash": "6757308959470555043"
+      },
+      {
+        "file": "src/app/download-patient-document/download-patient-document.component.html",
+        "hash": "905738478459110609"
+      },
+      {
+        "file": "src/app/download-patient-document/download-patient-document.component.ts",
+        "hash": "6237331159683323623"
+      },
+      {
+        "file": "src/app/forget-password/forget-password.component.html",
+        "hash": "15360481388886134706"
+      },
+      {
+        "file": "src/app/forget-password/forget-password.component.ts",
+        "hash": "4391608797682386463"
+      },
+      {
+        "file": "src/app/login/login.component.html",
+        "hash": "1850562707377358158"
+      },
+      {
+        "file": "src/app/login/login.component.ts",
+        "hash": "384190294475814620"
+      },
+      {
+        "file": "src/app/manage-account/manage-account.component.html",
+        "hash": "8702569319348005449"
+      },
+      {
+        "file": "src/app/manage-account/manage-account.component.ts",
+        "hash": "4269474978933766086"
+      },
+      {
+        "file": "src/app/navbar/navbar.component.css",
+        "hash": "2430391902522118788"
+      },
+      {
+        "file": "src/app/navbar/navbar.component.html",
+        "hash": "15233001251336469406"
+      },
+      {
+        "file": "src/app/navbar/navbar.component.ts",
+        "hash": "12637582963786513322"
+      },
+      {
+        "file": "src/app/patient-list/patient-list.component.html",
+        "hash": "3177005500685217408"
+      },
+      {
+        "file": "src/app/patient-list/patient-list.component.ts",
+        "hash": "15984531258319441024"
+      },
+      {
+        "file": "src/app/reset-password/reset-password.component.html",
+        "hash": "159406352753258415"
+      },
+      {
+        "file": "src/app/reset-password/reset-password.component.ts",
+        "hash": "7196765160048735208"
+      },
+      {
+        "file": "src/app/upload-document/upload-document.component.html",
+        "hash": "8541354671123541803"
+      },
+      {
+        "file": "src/app/upload-document/upload-document.component.ts",
+        "hash": "11511737359332649876"
+      },
+      {
+        "file": "src/assets/background.jpg",
+        "hash": "6239379788146168684"
+      },
+      {
+        "file": "src/assets/icon-128x128.png",
+        "hash": "16119513566521364320"
+      },
+      {
+        "file": "src/assets/icon-144x144.png",
+        "hash": "7918264055681161054"
+      },
+      {
+        "file": "src/assets/icon-152x152.png",
+        "hash": "15801439294603939434"
+      },
+      {
+        "file": "src/assets/icon-192x192.png",
+        "hash": "5426725225393538606"
+      },
+      {
+        "file": "src/assets/icon-384x384.png",
+        "hash": "14349113523743396697"
+      },
+      {
+        "file": "src/assets/icon-512x512.png",
+        "hash": "15496412176428542718"
+      },
+      {
+        "file": "src/assets/icon-72x72.png",
+        "hash": "8211841038932698272"
+      },
+      {
+        "file": "src/assets/icon-96x96.png",
+        "hash": "17857169027528193372"
+      },
+      {
+        "file": "src/auth.service.ts",
+        "hash": "13900221890941840851"
+      },
+      {
+        "file": "src/environment.ts",
+        "hash": "4875225039460554670"
+      },
+      {
+        "file": "src/favicon.ico",
+        "hash": "3988961587069885523"
+      },
+      {
+        "file": "src/index.html",
+        "hash": "2517172388398013588"
+      },
+      {
+        "file": "src/main.ts",
+        "hash": "4169901790405087765"
+      },
+      {
+        "file": "src/manifest.webmanifest",
+        "hash": "4007029919350604496"
+      },
+      {
+        "file": "src/medical-document.service.ts",
+        "hash": "8129712080686186782"
+      },
+      {
+        "file": "src/styles.css",
+        "hash": "2866083945719690482"
+      },
+      {
+        "file": "src/welcome_page/welcome.component.css",
+        "hash": "14383463965038309793"
+      },
+      {
+        "file": "src/welcome_page/welcome.component.html",
+        "hash": "4636125569444649641"
+      },
+      {
+        "file": "src/welcome_page/welcome.component.ts",
+        "hash": "10263824860012648126"
+      },
+      {
+        "file": "tailwind.config.js",
+        "hash": "14316312139468412756"
+      },
+      {
+        "file": "tsconfig.app.json",
+        "hash": "14560978611694835822"
+      },
+      {
+        "file": "tsconfig.json",
+        "hash": "4066421910395738655"
+      },
+      {
+        "file": "tsconfig.spec.json",
+        "hash": "11023685540591620072"
+      },
+      {
+        "file": "yarn.lock",
+        "hash": "4651940310248460147"
+      }
+    ]
+  }
+}

@@ -1,0 +1,160 @@
+<div class="bg-white rounded-2xl shadow-xl overflow-hidden border border-gray-200">
+  <!-- Enhanced Page Header with refined gradient and improved spacing -->
+
+
+  <div class="flex">
+    <!-- Enhanced Sidebar with deeper blues and better contrast -->
+   <app-sidebar class="fixed top-0 left-0 h-full"></app-sidebar>
+   <app-header class="fixed top-0 right-0 left-0"></app-header>
+
+    <!-- Enhanced Main Content with better shadows and spacing -->
+    <div class="flex-1 p-8 bg-gray-50 ml-64 mt-20">
+      <!-- Breadcrumb Navigation -->
+      <div class="mb-6 flex items-center text-sm text-gray-600">
+
+        <span class="text-teal-600 font-medium">Permissions</span>
+      </div>
+
+      <!-- User Selection Section with improved card design -->
+      <div class="mb-8">
+        <h2 class="text-xl font-semibold text-gray-800 mb-4 flex items-center">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-2 text-teal-600" viewBox="0 0 20 20" fill="currentColor">
+            <path d="M13 6a3 3 0 11-6 0 3 3 0 016 0zM18 8a2 2 0 11-4 0 2 2 0 014 0zM14 15a4 4 0 00-8 0v3h8v-3zM6 8a2 2 0 11-4 0 2 2 0 014 0zM16 18v-3a5.972 5.972 0 00-.75-2.906A3.005 3.005 0 0119 15v3h-3zM4.75 12.094A5.973 5.973 0 004 15v3H1v-3a3 3 0 013.75-2.906z" />
+          </svg>
+          Select User
+        </h2>
+        <div class="bg-white p-6 rounded-2xl border border-gray-200 shadow-md hover:shadow-lg transition-shadow duration-300">
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div class="col-span-1 md:col-span-2">
+              <label for="userSelect" class="block text-sm font-semibold text-gray-700 mb-2">Staff Member</label>
+              <select
+                id="userSelect"
+                [(ngModel)]="selectedUser"
+                (change)="selectUser()"
+                class="w-full px-4 py-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-teal-500 focus:border-teal-500 transition-all duration-200 shadow-sm">
+                <option [ngValue]="null" disabled selected>Select a staff member</option>
+                <option *ngFor="let user of users" [ngValue]="user">
+                  {{ user.name }} - {{ user.email }}
+                </option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-sm font-semibold text-gray-700 mb-2">Current Role</label>
+              <div *ngIf="selectedUser" class="flex items-center p-4 bg-white rounded-xl border border-gray-100 shadow-md">
+                <div class="h-12 w-12 rounded-full bg-gradient-to-br from-teal-500 to-cyan-600 flex items-center justify-center text-white font-bold text-lg shadow-md">
+                  {{ selectedUser.first_name?.charAt(0) || '' }}
+                </div>
+                <div class="ml-4">
+                  <p class="text-sm font-semibold text-gray-900">{{ selectedUser.role || 'No role assigned' }}</p>
+                  <p class="text-xs text-gray-500">ID: {{ selectedUser.id }}</p>
+                </div>
+              </div>
+              <div *ngIf="!selectedUser" class="text-sm text-gray-500 p-4 bg-white rounded-xl border border-gray-200 shadow-sm flex items-center justify-center h-16">
+                <span class="text-gray-400 italic">No user selected</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Permissions Section with improved visual hierarchy -->
+      <div *ngIf="selectedUser" class="mb-8">
+        <h2 class="text-xl font-semibold text-gray-800 mb-4 flex items-center">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-2 text-teal-600" viewBox="0 0 20 20" fill="currentColor">
+            <path fill-rule="evenodd" d="M2.166 4.999A11.954 11.954 0 0010 1.944 11.954 11.954 0 0017.834 5c.11.65.166 1.32.166 2.001 0 5.225-3.34 9.67-8 11.317C5.34 16.67 2 12.225 2 7c0-.682.057-1.35.166-2.001zm11.541 3.708a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+          </svg>
+          Manage Permissions
+        </h2>
+        <div class="bg-white p-6 rounded-2xl border border-gray-200 shadow-md hover:shadow-lg transition-shadow duration-300">
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <!-- Role Selection with improved select styling -->
+            <div>
+              <label for="roleSelect" class="block text-sm font-semibold text-gray-700 mb-2">Role Assignment</label>
+              <div class="relative">
+                <select
+                  id="roleSelect"
+                  [(ngModel)]="selectedUser.role"
+                  class="w-full px-4 py-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-teal-500 focus:border-teal-500 transition-all duration-200 shadow-sm appearance-none pr-10">
+                  <option value="user">user</option>
+                  <option value="admin">admin</option>
+                  <option value="doctor">doctor</option>
+                </select>
+                <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
+                  <svg class="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
+                    <path d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"/>
+                  </svg>
+                </div>
+              </div>
+            </div>
+
+            <!-- Status Toggle with improved visual design -->
+            <div>
+              <label class="block text-sm font-semibold text-gray-700 mb-2">Account Status</label>
+              <div class="flex items-center space-x-4 p-3 bg-gray-50 rounded-xl border border-gray-200">
+                <label class="inline-flex items-center p-3 bg-white rounded-xl hover:bg-gray-50 transition-colors duration-200 cursor-pointer shadow-sm border border-gray-100">
+                  <input
+                    type="radio"
+                    name="status"
+                    [value]="true"
+                    [(ngModel)]="selectedUser.is_active"
+                    class="form-radio h-5 w-5 text-teal-600 transition duration-150 ease-in-out">
+                  <span class="ml-2 text-sm font-medium text-gray-700">Active</span>
+                </label>
+                <label class="inline-flex items-center p-3 bg-white rounded-xl hover:bg-gray-50 transition-colors duration-200 cursor-pointer shadow-sm border border-gray-100">
+                  <input
+                    type="radio"
+                    name="status"
+                    [value]="false"
+                    [(ngModel)]="selectedUser.is_active"
+                    class="form-radio h-5 w-5 text-red-600 transition duration-150 ease-in-out">
+                  <span class="ml-2 text-sm font-medium text-gray-700">Inactive</span>
+                </label>
+              </div>
+            </div>
+          </div>
+
+          <!-- Permission Checkboxes with improved grouping and visual design -->
+
+
+
+
+
+          <!-- Action Buttons with improved styling -->
+          <div class="flex justify-end space-x-4 mt-8">
+            <button
+              type="button"
+              class="px-6 py-3 bg-gray-200 text-gray-700 rounded-xl hover:bg-gray-300 transition-all duration-200 shadow-sm font-medium">
+              Cancel
+            </button>
+            <button
+              type="button"
+              [disabled]="!selectedUser"
+              (click)="updatePermission()"
+              class="px-6 py-3 bg-gradient-to-r from-teal-600 to-cyan-600 text-white rounded-xl hover:from-teal-700 hover:to-cyan-700 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed shadow-md font-medium flex items-center">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
+                <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
+              </svg>
+              Save Changes
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Added notification for non-selected user state -->
+      <div *ngIf="!selectedUser" class="bg-blue-50 border-l-4 border-blue-500 p-4 rounded-lg shadow-sm">
+        <div class="flex">
+          <div class="flex-shrink-0">
+            <svg class="h-5 w-5 text-blue-500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+              <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd" />
+            </svg>
+          </div>
+          <div class="ml-3">
+            <p class="text-sm text-blue-800">
+              Please select a staff member from the dropdown above to manage their permissions.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

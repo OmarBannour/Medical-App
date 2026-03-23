@@ -1,0 +1,299 @@
+<app-navbar ></app-navbar>
+
+<!-- Password Change Modal -->
+<div class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 transition-opacity" *ngIf="showPasswordChangeForm">
+  <div class="relative w-full max-w-md p-6 mx-4 bg-white rounded-lg shadow-xl">
+    <!-- Close button -->
+   
+
+    <h2 class="text-2xl font-bold text-gray-900 mb-2">Change Your Password</h2>
+    <p class="text-gray-600 mb-6">For security reasons, please update your password before proceeding.</p>
+
+    <form (submit)="updatePassword(); $event.preventDefault()" class="space-y-4">
+      <div class="space-y-2">
+        <label class="block text-sm font-medium text-gray-700">Email:</label>
+        <input type="email" [(ngModel)]="email" name="email" required
+               class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-teal-500" />
+      </div>
+
+      <div class="space-y-2">
+        <label class="block text-sm font-medium text-gray-700">New Password:</label>
+        <input type="password" [(ngModel)]="newPassword" name="newPassword" required
+               class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-teal-500" />
+      </div>
+
+      <div class="space-y-2">
+        <label class="block text-sm font-medium text-gray-700">Confirm Password:</label>
+        <input type="password" [(ngModel)]="confirmPassword" name="confirmPassword" required
+               class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-teal-500" />
+      </div>
+
+      <div class="text-red-600 text-sm font-medium" *ngIf="passwordError">{{ passwordError }}</div>
+
+      <button class="w-full py-2 px-4 bg-teal-600 hover:bg-teal-700 text-white font-medium rounded-md shadow transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-500 disabled:opacity-50"
+              type="submit" [disabled]="isUpdating">
+        {{ isUpdating ? 'Updating...' : 'Update Password' }}
+      </button>
+    </form>
+  </div>
+</div>
+
+<!-- Add CSS for navbar transitions -->
+<style>
+  .navbar-visible {
+    transform: translateY(0);
+    transition: transform 0.3s ease-in-out;
+  }
+
+  .navbar-hidden {
+    transform: translateY(-100%);
+    transition: transform 0.3s ease-in-out;
+  }
+</style>
+
+<!-- Main Content -->
+<main class="pt-16 bg-gray-50">
+  <!-- Hero Section with Medical Background -->
+  <section class="relative bg-gradient-to-r from-teal-600 to-cyan-700 text-white py-20 md:py-28 overflow-hidden">
+    <!-- SVG Medical Elements (Background) -->
+    <div class="absolute inset-0 opacity-10">
+      <svg width="100%" height="100%" viewBox="0 0 800 600" xmlns="http://www.w3.org/2000/svg">
+        <!-- Medical Cross Patterns -->
+        <g fill="currentColor">
+          <path d="M50 50h20v60h60v20h-60v60h-20v-60H0v-20h50z" />
+          <path d="M250 150h20v60h60v20h-60v60h-20v-60h-50v-20h50z" />
+          <path d="M450 250h20v60h60v20h-60v60h-20v-60h-50v-20h50z" />
+          <path d="M650 350h20v60h60v20h-60v60h-20v-60h-50v-20h50z" />
+          <!-- Stethoscope Shape -->
+          <path d="M150 400c0 27.614-22.386 50-50 50s-50-22.386-50-50 22.386-50 50-50v-50h20v50c27.614 0 50 22.386 50 50z" />
+          <!-- Heartbeat Line -->
+          <path d="M400 100 L420 100 L430 70 L450 130 L470 100 L490 100" stroke-width="5" fill="none" stroke="currentColor" />
+        </g>
+      </svg>
+    </div>
+
+    <div class="container mx-auto px-4 max-w-6xl relative z-10">
+      <div class="md:flex md:items-center md:justify-between">
+        <div class="md:w-1/2 text-center md:text-left md:pr-8">
+          <h1 class="text-3xl md:text-5xl font-bold leading-tight mb-4">Advanced Healthcare Management System</h1>
+          <p class="text-xl md:text-2xl opacity-90 mb-8">Streamline your clinical workflow with our comprehensive suite of integrated tools designed by medical professionals, for medical professionals.</p>
+          <div class="flex flex-col sm:flex-row gap-4 justify-center md:justify-start">
+            <button class="px-8 py-3 bg-white text-teal-700 font-semibold rounded-lg shadow-lg hover:bg-gray-100 transition-colors">Request Demo</button>
+            <button class="px-8 py-3 bg-transparent border-2 border-white text-white font-semibold rounded-lg hover:bg-white hover:bg-opacity-10 transition-colors">Explore Features</button>
+          </div>
+        </div>
+
+        <div class="hidden md:block md:w-1/2">
+          <!-- Medical Dashboard Illustration -->
+          <div class="relative mt-8 md:mt-0 rounded-xl overflow-hidden shadow-2xl bg-white p-2">
+            <div class="aspect-w-16 aspect-h-9 bg-gray-100 rounded-lg">
+              <!-- Mockup of Medical Dashboard -->
+              <div class="p-4 flex flex-col h-full">
+                <div class="flex justify-between items-center mb-4">
+                  <div class="w-32 h-8 bg-teal-100 rounded"></div>
+                  <div class="flex space-x-2">
+                    <div class="w-8 h-8 bg-teal-100 rounded-full"></div>
+                    <div class="w-8 h-8 bg-teal-100 rounded-full"></div>
+                  </div>
+                </div>
+                <div class="grid grid-cols-3 gap-3 mb-4">
+                  <div class="bg-teal-50 p-3 rounded-lg">
+                    <div class="w-full h-3 bg-teal-200 rounded mb-2"></div>
+                    <div class="w-3/4 h-3 bg-teal-200 rounded"></div>
+                  </div>
+                  <div class="bg-teal-50 p-3 rounded-lg">
+                    <div class="w-full h-3 bg-teal-200 rounded mb-2"></div>
+                    <div class="w-3/4 h-3 bg-teal-200 rounded"></div>
+                  </div>
+                  <div class="bg-teal-50 p-3 rounded-lg">
+                    <div class="w-full h-3 bg-teal-200 rounded mb-2"></div>
+                    <div class="w-3/4 h-3 bg-teal-200 rounded"></div>
+                  </div>
+                </div>
+                <div class="flex-grow bg-teal-50 rounded-lg p-3">
+                  <div class="w-full h-24 bg-white rounded-md mb-3"></div>
+                  <div class="grid grid-cols-2 gap-2">
+                    <div class="h-4 bg-white rounded"></div>
+                    <div class="h-4 bg-white rounded"></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Features Section with Medical Icons -->
+  <section class="py-16 md:py-24 bg-white">
+    <div class="container mx-auto px-4 max-w-6xl">
+      <div class="text-center mb-12">
+        <h2 class="text-3xl font-bold text-gray-900 mb-3">Comprehensive Healthcare Solutions</h2>
+        <p class="text-xl text-gray-600 max-w-3xl mx-auto">Our integrated platform delivers everything your practice needs to provide exceptional patient care.</p>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+        <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100 hover:shadow-md transition-shadow group">
+          <!-- Patient Icon SVG -->
+          <div class="mb-4 text-teal-600 group-hover:text-teal-700 transition-colors">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-12 h-12">
+              <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path>
+              <circle cx="9" cy="7" r="4"></circle>
+              <path d="M22 21v-2a4 4 0 0 0-3-3.87"></path>
+              <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+            </svg>
+          </div>
+          <h3 class="text-xl font-bold text-gray-900 mb-2">Patient Management</h3>
+          <p class="text-gray-600">Comprehensive electronic health records with customizable templates and intuitive patient history tracking.</p>
+        </div>
+
+        <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100 hover:shadow-md transition-shadow group">
+          <!-- Analytics Icon SVG -->
+          <div class="mb-4 text-teal-600 group-hover:text-teal-700 transition-colors">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-12 h-12">
+              <rect x="2" y="2" width="20" height="20" rx="2" ry="2"></rect>
+              <line x1="2" y1="12" x2="22" y2="12"></line>
+              <line x1="12" y1="2" x2="12" y2="22"></line>
+            </svg>
+          </div>
+          <h3 class="text-xl font-bold text-gray-900 mb-2">Clinical Analytics</h3>
+          <p class="text-gray-600">Data-driven insights to optimize treatment plans, monitor outcomes, and enhance quality of care metrics.</p>
+        </div>
+
+        <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100 hover:shadow-md transition-shadow group">
+          <!-- Mobile Icon SVG -->
+          <div class="mb-4 text-teal-600 group-hover:text-teal-700 transition-colors">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-12 h-12">
+              <rect x="5" y="2" width="14" height="20" rx="2" ry="2"></rect>
+              <line x1="12" y1="18" x2="12" y2="18"></line>
+            </svg>
+          </div>
+          <h3 class="text-xl font-bold text-gray-900 mb-2">Mobile Health</h3>
+          <p class="text-gray-600">Secure access to patient records, lab results, and clinical tools from any device, anywhere, anytime.</p>
+        </div>
+
+        <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100 hover:shadow-md transition-shadow group">
+          <!-- Security Icon SVG -->
+          <div class="mb-4 text-teal-600 group-hover:text-teal-700 transition-colors">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-12 h-12">
+              <path d="M12 2s8 3 8 10v3.5C20 17 19 20 12 20s-8-3-8-4.5V12c0-7 8-10 8-10z"></path>
+              <path d="M9 12l2 2 4-4"></path>
+            </svg>
+          </div>
+          <h3 class="text-xl font-bold text-gray-900 mb-2">HIPAA Compliant</h3>
+          <p class="text-gray-600">Enterprise-grade security protocols and compliance monitoring to keep patient data safe and meet regulations.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Stats Section with Medical Theme -->
+  <section class="py-16 md:py-20 bg-gray-50">
+    <div class="container mx-auto px-4 max-w-6xl">
+      <div class="text-center mb-12">
+        <h2 class="text-3xl font-bold text-gray-900 mb-3">Trusted by Healthcare Professionals</h2>
+        <p class="text-xl text-gray-600 max-w-3xl mx-auto">Join the growing community of medical practices enhancing patient care with our platform.</p>
+      </div>
+
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
+        <div class="bg-white p-6 rounded-lg shadow-sm relative overflow-hidden group">
+          <div class="absolute top-0 left-0 w-full h-1 bg-teal-500 transform origin-left transition-transform duration-300 group-hover:scale-x-100"></div>
+          <div class="text-3xl md:text-4xl font-bold text-teal-600 mb-2">12,000+</div>
+          <div class="text-lg text-gray-600">Healthcare Providers</div>
+        </div>
+
+        <div class="bg-white p-6 rounded-lg shadow-sm relative overflow-hidden group">
+          <div class="absolute top-0 left-0 w-full h-1 bg-teal-500 transform origin-left transition-transform duration-300 group-hover:scale-x-100"></div>
+          <div class="text-3xl md:text-4xl font-bold text-teal-600 mb-2">3.5M+</div>
+          <div class="text-lg text-gray-600">Patient Records</div>
+        </div>
+
+        <div class="bg-white p-6 rounded-lg shadow-sm relative overflow-hidden group">
+          <div class="absolute top-0 left-0 w-full h-1 bg-teal-500 transform origin-left transition-transform duration-300 group-hover:scale-x-100"></div>
+          <div class="text-3xl md:text-4xl font-bold text-teal-600 mb-2">99.9%</div>
+          <div class="text-lg text-gray-600">Uptime Reliability</div>
+        </div>
+
+        <div class="bg-white p-6 rounded-lg shadow-sm relative overflow-hidden group">
+          <div class="absolute top-0 left-0 w-full h-1 bg-teal-500 transform origin-left transition-transform duration-300 group-hover:scale-x-100"></div>
+          <div class="text-3xl md:text-4xl font-bold text-teal-600 mb-2">24/7</div>
+          <div class="text-lg text-gray-600">Technical Support</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Testimonial Section -->
+  <section class="py-16 md:py-24 bg-white">
+    <div class="container mx-auto px-4 max-w-6xl">
+      <div class="text-center mb-12">
+        <h2 class="text-3xl font-bold text-gray-900 mb-3">What Medical Professionals Say</h2>
+        <p class="text-xl text-gray-600 max-w-3xl mx-auto">Hear from healthcare providers who have transformed their practice with our system.</p>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+        <div class="bg-gray-50 p-6 rounded-xl shadow-sm relative">
+          <div class="absolute -top-4 left-6 text-teal-500 text-5xl">"</div>
+          <p class="text-gray-700 mt-4 mb-6">This platform has revolutionized our patient management workflow. We've reduced administrative time by 40% and can focus more on patient care.</p>
+          <div class="flex items-center">
+            <div class="w-12 h-12 bg-teal-100 rounded-full mr-4 flex items-center justify-center text-teal-700 font-bold">DR</div>
+            <div>
+              <h4 class="font-bold text-gray-900">Dr. Rebecca Chen</h4>
+              <p class="text-gray-600 text-sm">Family Medicine, Portland</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="bg-gray-50 p-6 rounded-xl shadow-sm relative">
+          <div class="absolute -top-4 left-6 text-teal-500 text-5xl">"</div>
+          <p class="text-gray-700 mt-4 mb-6">The integrated analytics have given us insights we never had before. We've been able to improve patient outcomes while optimizing our resources.</p>
+          <div class="flex items-center">
+            <div class="w-12 h-12 bg-teal-100 rounded-full mr-4 flex items-center justify-center text-teal-700 font-bold">JM</div>
+            <div>
+              <h4 class="font-bold text-gray-900">Dr. James Mitchell</h4>
+              <p class="text-gray-600 text-sm">Cardiology, Chicago</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="bg-gray-50 p-6 rounded-xl shadow-sm relative">
+          <div class="absolute -top-4 left-6 text-teal-500 text-5xl">"</div>
+          <p class="text-gray-700 mt-4 mb-6">The mobile access has been a game-changer for our multi-location practice. I can review patient data securely from anywhere, at any time.</p>
+          <div class="flex items-center">
+            <div class="w-12 h-12 bg-teal-100 rounded-full mr-4 flex items-center justify-center text-teal-700 font-bold">SK</div>
+            <div>
+              <h4 class="font-bold text-gray-900">Dr. Sarah Kim</h4>
+              <p class="text-gray-600 text-sm">Pediatrics, Austin</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA Section with Medical Theme -->
+  <section class="py-16 md:py-24 bg-gradient-to-r from-cyan-600 to-teal-600 text-white relative overflow-hidden">
+    <!-- Background Medical SVG Pattern -->
+    <div class="absolute inset-0 opacity-10">
+      <svg width="100%" height="100%" viewBox="0 0 800 400" xmlns="http://www.w3.org/2000/svg">
+        <!-- Heartbeat Pattern -->
+        <path d="M0 200 Q 80 200, 100 150 T 200 200 T 300 150 T 400 200 T 500 150 T 600 200 T 700 150 T 800 200" stroke="currentColor" stroke-width="4" fill="none" />
+        <!-- Medical Symbols -->
+        <circle cx="150" cy="100" r="20" fill="currentColor" />
+        <circle cx="650" cy="300" r="20" fill="currentColor" />
+        <path d="M350 50h20v40h40v20h-40v40h-20v-40h-40v-20h40z" fill="currentColor" />
+        <path d="M450 250h20v40h40v20h-40v40h-20v-40h-40v-20h40z" fill="currentColor" />
+      </svg>
+    </div>
+
+    <div class="container mx-auto px-4 max-w-4xl text-center relative z-10">
+      <h2 class="text-3xl md:text-4xl font-bold mb-4">Elevate Your Healthcare Practice Today</h2>
+      <p class="text-xl opacity-90 mb-8 max-w-2xl mx-auto">Join thousands of healthcare professionals who are already using our platform to improve patient outcomes and practice efficiency.</p>
+      <div class="flex flex-col sm:flex-row gap-4 justify-center">
+        <button class="px-8 py-3 bg-white text-teal-700 font-semibold rounded-lg shadow-lg hover:bg-gray-100 transition-colors">Start 30-Day Free Trial</button>
+        <button class="px-8 py-3 bg-transparent border-2 border-white text-white font-semibold rounded-lg hover:bg-white hover:bg-opacity-10 transition-colors">Schedule Personalized Demo</button>
+      </div>
+    </div>
+  </section>
+</main>

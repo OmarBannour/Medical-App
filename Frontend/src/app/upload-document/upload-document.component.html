@@ -1,0 +1,482 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MediPro - Patients List</title>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css" rel="stylesheet">
+  <style>
+    .modal {
+      display: none;
+      position: fixed;
+      z-index: 50;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      overflow: auto;
+      background-color: rgba(0,0,0,0.4);
+    }
+
+    .modal-content {
+      max-width: 500px;
+      margin: 10% auto;
+      animation: modalFadeIn 0.3s;
+    }
+
+    @keyframes modalFadeIn {
+      from {opacity: 0; transform: translateY(-20px);}
+      to {opacity: 1; transform: translateY(0);}
+    }
+
+    /* Custom scrollbar for better UX */
+    ::-webkit-scrollbar {
+      width: 8px;
+      height: 8px;
+    }
+
+    ::-webkit-scrollbar-track {
+      background: #f1f5f9;
+      border-radius: 10px;
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: #94a3b8;
+      border-radius: 10px;
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+      background: #64748b;
+    }
+
+    /* Smooth transitions */
+    * {
+      transition: all 0.2s ease;
+    }
+
+    /* Patient row hover effect */
+    .patient-row:hover {
+      transform: translateY(-2px);
+    }
+  </style>
+</head>
+<body class="bg-gradient-to-br from-blue-50 to-indigo-100 min-h-screen font-sans">
+  <!-- Main container with flex layout -->
+  <div class="flex min-h-screen">
+    <app-sidebar class="fixed"></app-sidebar>
+    <app-header class="fixed top-0 left-0 right-0 h-16 z-10 "></app-header>
+
+
+    <!-- Main Content with padding to account for fixed sidebar -->
+    <div class="flex-1 ml-64 mt-10" >
+      <div class="max-w-7xl mx-auto py-10 px-4 sm:px-6 lg:px-8">
+        <!-- Header with Logo and Navigation -->
+
+
+        <!-- Main Content -->
+        <main class="bg-white rounded-2xl shadow-xl overflow-hidden border border-gray-100 transform transition-all duration-300 hover:shadow-2xl">
+          <!-- Page Header -->
+          <div class="px-8 py-6 bg-gradient-to-r from-blue-600 to-indigo-600 text-white">
+            <div class="flex justify-between items-center">
+              <div>
+                <h1 class="text-2xl font-bold">Patients List</h1>
+                <p class="text-blue-100 text-sm mt-1">Patient records management dashboard</p>
+              </div>
+              <div class="flex space-x-3">
+                <div class="relative">
+                  <input
+                    type="text"
+                    placeholder="Search patients..."
+                    class="px-4 py-2 pr-8 rounded-lg text-sm bg-white text-gray-800 placeholder-gray-500 border-none focus:outline-none focus:ring-2 focus:ring-blue-300 transition-all duration-200 w-56"
+                    (input)="filterPatients($event)"
+                  />
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-gray-500 absolute right-3 top-2.5" viewBox="0 0 20 20" fill="currentColor">
+                    <path fill-rule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clip-rule="evenodd" />
+                  </svg>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Optional loading indicator -->
+          <div *ngIf="loading" class="flex justify-center my-8">
+            <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+          </div>
+
+          <!-- Error message display -->
+          <div *ngIf="errorMessage" class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mt-4 mx-8">
+            <span class="block sm:inline">{{ errorMessage }}</span>
+
+          </div>
+
+          <div class="bg-indigo-50 px-8 py-4 flex items-center justify-between">
+            <div class="flex items-center space-x-4">
+
+              <!-- Fixed select value binding -->
+              <select class="text-sm bg-white border border-gray-200 rounded-md px-3 py-1.5 focus:outline-none focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 shadow-sm transition-all duration-200" (change)="setFilter($any($event.target).value)">
+                <option value="all">All Genders</option>
+                <option value="male">Male</option>
+                <option value="female">Female</option>
+              </select>
+            </div>
+            <div class="text-sm text-indigo-600 font-medium">
+              <span class="bg-indigo-100 px-2 py-1 rounded text-indigo-700">{{ filterType === 'all' ? 'All Patients' : filterType === 'male' ? 'Male Patients' : 'Female Patients' }}</span>
+            </div>
+          </div>
+
+          <!-- Patient Table -->
+          <div class="overflow-x-auto">
+            <table class="min-w-full divide-y divide-gray-200">
+              <thead class="bg-gray-50 sticky top-0 z-10">
+                <tr>
+                  <th scope="col" class="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Patient
+                  </th>
+                  <th scope="col" class="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Gender
+                  </th>
+                  <th scope="col" class="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Birthday
+                  </th>
+                  <th scope="col" class="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Actions
+                  </th>
+                </tr>
+              </thead>
+              <tbody class="bg-white divide-y divide-gray-200">
+                <tr *ngFor="let patient of patients" class="patient-row hover:bg-blue-50 transition-colors duration-200">
+                  <td class="px-6 py-4 whitespace-nowrap">
+                    <div class="flex items-center">
+                      <div class="h-10 w-10 rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center text-white font-medium shadow-sm">
+                        {{ patient.name.charAt(0) }}{{ patient.name.split(' ')[1]?.charAt(0) || '' }}
+                      </div>
+                      <div class="ml-4">
+                        <div class="text-sm font-medium text-gray-900">{{ patient.name }}</div>
+                        <div class="text-xs text-gray-500">Patient ID: {{ patient.id || 'N/A' }}</div>
+                        <div class="text-xs text-gray-500">User ID: {{ patient.user_id || 'N/A' }}</div>
+                      </div>
+                    </div>
+                  </td>
+                  <td class="px-6 py-4 whitespace-nowrap">
+                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium"
+                          [ngClass]="{'bg-blue-100 text-blue-800': patient.gender === 'Male',
+                                     'bg-pink-100 text-pink-800': patient.gender === 'Female',
+                                     'bg-gray-100 text-gray-800': patient.gender !== 'Male' && patient.gender !== 'Female'}">
+                      {{ patient.gender }}
+                    </span>
+                  </td>
+                  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                    {{ patient.birthday || 'No birthday information' }}
+                  </td>
+                  <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                    <button (click)="OpenUploadModal(patient)"
+                            aria-label="Add new report for patient"
+                            class="inline-flex items-center px-3 py-1.5 border border-transparent text-xs font-medium rounded-md shadow-sm text-white bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition-all duration-200">
+                      <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                        <path fill-rule="evenodd" d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z" clip-rule="evenodd" />
+                      </svg>
+                    New Medical Document
+                    </button>
+                  </td>
+                </tr>
+                <!-- Empty state when no patients are available -->
+                <tr *ngIf="patients?.length === 0" class="hover:bg-blue-50">
+                  <td colspan="4" class="px-6 py-10 text-center">
+                    <div class="flex flex-col items-center justify-center">
+                      <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 text-gray-300 mb-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
+                      </svg>
+                      <p class="text-gray-500 text-lg font-medium">No patients found</p>
+                      <p class="text-gray-400 text-sm mt-1">Add a new patient to get started</p>
+                    </div>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <!-- Pagination Section -->
+          <div class="bg-gray-50 px-8 py-4 flex items-center justify-between border-t border-gray-200">
+            <div class="flex items-center">
+              <p class="text-sm text-gray-700">
+                Showing page <span class="font-medium">{{ curentPage }}</span> of <span class="font-medium">{{ LastPage }}</span>
+              </p>
+            </div>
+            <div class="flex space-x-2">
+              <!-- Previous Page Button -->
+              <button
+                [disabled]="curentPage === 1"
+                (click)="ListeOfPatients(curentPage - 1)"
+                class="px-3 py-1.5 rounded-md border text-gray-500 transition-colors duration-200"
+                [ngClass]="{
+                  'bg-gray-100 border-gray-200 cursor-not-allowed': curentPage === 1,
+                  'bg-white border-gray-200 hover:bg-gray-50': curentPage !== 1
+                }"
+              >
+                Previous
+              </button>
+
+              <!-- First Page Button -->
+              <button
+                (click)="ListeOfPatients(1)"
+                class="px-3 py-1.5 rounded-md border transition-colors duration-200"
+                [ngClass]="{
+                  'bg-indigo-600 border-indigo-600 text-white font-medium': curentPage === 1,
+                  'bg-white border-gray-200 text-gray-700 hover:bg-gray-50': curentPage !== 1
+                }"
+              >
+                1
+              </button>
+
+              <!-- Ellipsis for large gaps at the start -->
+              <span *ngIf="curentPage > 3" class="px-3 py-1.5 text-gray-500">...</span>
+
+              <!-- Page before current -->
+              <button
+                *ngIf="curentPage > 2"
+                (click)="ListeOfPatients(curentPage - 1)"
+                class="px-3 py-1.5 bg-white rounded-md border border-gray-200 text-gray-700 hover:bg-gray-50 transition-colors duration-200"
+              >
+                {{ curentPage - 1 }}
+              </button>
+
+              <!-- Current Page -->
+              <button
+                *ngIf="curentPage !== 1 && curentPage !== LastPage"
+                class="px-3 py-1.5 bg-indigo-600 rounded-md border border-indigo-600 text-white font-medium"
+              >
+                {{ curentPage }}
+              </button>
+
+              <!-- Page after current -->
+              <button
+                *ngIf="curentPage < LastPage - 1"
+                (click)="ListeOfPatients(curentPage + 1)"
+                class="px-3 py-1.5 bg-white rounded-md border border-gray-200 text-gray-700 hover:bg-gray-50 transition-colors duration-200"
+              >
+                {{ curentPage + 1 }}
+              </button>
+
+              <!-- Ellipsis for large gaps at the end -->
+              <span *ngIf="curentPage < LastPage - 2" class="px-3 py-1.5 text-gray-500">...</span>
+
+              <!-- Last Page Button -->
+              <button
+                *ngIf="LastPage > 1"
+                (click)="ListeOfPatients(LastPage)"
+                class="px-3 py-1.5 rounded-md border transition-colors duration-200"
+                [ngClass]="{
+                  'bg-indigo-600 border-indigo-600 text-white font-medium': curentPage === LastPage,
+                  'bg-white border-gray-200 text-gray-700 hover:bg-gray-50': curentPage !== LastPage
+                }"
+              >
+                {{ LastPage }}
+              </button>
+
+              <!-- Next Page Button -->
+              <button
+                [disabled]="curentPage === LastPage"
+                (click)="ListeOfPatients(curentPage + 1)"
+                class="px-3 py-1.5 rounded-md border text-gray-500 transition-colors duration-200"
+                [ngClass]="{
+                  'bg-gray-100 border-gray-200 cursor-not-allowed': curentPage === LastPage,
+                  'bg-white border-gray-200 hover:bg-gray-50': curentPage !== LastPage
+                }"
+              >
+                Next
+              </button>
+            </div>
+          </div>
+        </main>
+      </div>
+    </div>
+  </div>
+  <!-- Modal - Updated to be smaller and close when clicking outside -->
+<div *ngIf="OpenModal" class="fixed inset-0 overflow-y-auto z-50 flex items-center justify-center" role="dialog" aria-modal="true" aria-labelledby="modal-title" (click)="closeModel()">
+
+  <!-- Backdrop with improved transition -->
+  <div class="fixed inset-0 transition-opacity duration-300" aria-hidden="true">
+    <div class="absolute inset-0 bg-gray-900 bg-opacity-75 backdrop-blur-sm"></div>
+  </div>
+
+  <!-- Modal Content with subtle animation - Made smaller and prevents click events from propagating to close background -->
+  <div class="bg-white rounded-2xl shadow-2xl overflow-hidden relative z-50 transform transition-all duration-300 scale-100 max-w-md w-full mx-4" (click)="$event.stopPropagation()">
+    <!-- Header with gradient background -->
+    <div class="bg-gradient-to-r from-blue-600 to-blue-700 p-4">
+      <div class="flex justify-between items-center">
+        <h2 id="modal-title" class="text-xl font-bold text-white">Upload Document</h2>
+        <button (click)="closeModel()" class="text-white hover:text-blue-200 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-300 focus:ring-opacity-50 rounded-full p-1" aria-label="Close modal">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
+      </div>
+    </div>
+
+    <div class="p-5">
+      <form (submit)="uploadFile($event)" class="space-y-4">
+        <!-- Document Name Field -->
+        <div>
+          <label for="title" class="block text-sm font-medium text-gray-700 mb-1">Document Name</label>
+          <div class="relative">
+            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
+              </svg>
+            </div>
+            <input
+              type="text"
+              id="title"
+              [(ngModel)]="title"
+              name="title"
+              placeholder="Enter document name"
+              required
+              class="block w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-150 ease-in-out"
+            >
+          </div>
+        </div>
+
+        <!-- Document Type Field -->
+        <div>
+          <label for="type" class="block text-sm font-medium text-gray-700 mb-1">Type of Document</label>
+          <div class="relative">
+            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+              </svg>
+            </div>
+            <select
+              [(ngModel)]="type"
+              name="type"
+              id="type"
+              class="block w-full pl-10 pr-10 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-150 ease-in-out appearance-none"
+              aria-required="true"
+            >
+              <option value="" disabled selected>Select a Type</option>
+              <option value="Report">Report</option>
+              <option value="Lab Result">Lab Result</option>
+              <option value="EGC">EGC</option>
+            </select>
+            <div class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+              </svg>
+            </div>
+          </div>
+        </div>
+
+        <!-- Patient ID Field -->
+        <div>
+          <label for="patient_id" class="block text-sm font-medium text-gray-700 mb-1">Patient ID</label>
+          <div class="relative">
+            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+              </svg>
+            </div>
+            <input
+              type="text"
+              id="patient_id"
+              [(ngModel)]="patient_id"
+              name="patient_id"
+              placeholder="Enter patient ID"
+              required
+              class="block w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-150 ease-in-out bg-gray-50"
+              [value]="selectedPatient?.id || ''"
+              readonly
+            >
+          </div>
+        </div>
+
+
+ <!-- Summary Field -->
+        <div>
+          <label for="summary" class="block text-sm font-medium text-gray-700 mb-1">Summary</label>
+          <div class="relative">
+            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6H4a2 2 0 00-2 2v12a2 2 0 002 2h8a2 2 0 002-2v-8m-9 4h14" />
+              </svg>
+            </div>
+            <textarea
+              id="summary"
+              [(ngModel)]="summary"
+              name="summary"
+              placeholder="Enter summary"
+              class="block w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-150 ease-in-out"
+            ></textarea>
+          </div>
+        </div>
+        <!-- File Upload Area -->
+        <div class="mt-4">
+          <label for="file-upload" class="block text-sm font-medium text-gray-700 mb-1">File</label>
+          <div class="mt-1 flex justify-center px-4 pt-4 pb-4 border-2 border-gray-300 border-dashed rounded-lg hover:border-blue-400 transition duration-200 ease-in-out group bg-gray-50">
+            <div class="space-y-1 text-center">
+              <svg class="mx-auto h-10 w-10 text-gray-400 group-hover:text-blue-500 transition-colors" stroke="currentColor" fill="none" viewBox="0 0 48 48" aria-hidden="true">
+                <path d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+              </svg>
+              <div class="flex text-sm text-gray-600 justify-center">
+                <label for="file-upload" class="relative cursor-pointer bg-white rounded-md font-medium text-blue-600 hover:text-blue-500 focus-within:outline-none focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-blue-500 px-2 py-1.5 shadow-sm">
+                  <span>Upload a file</span>
+                  <input
+                    id="file-upload"
+                    name="file-upload"
+                    type="file"
+                    (change)="onFileSelected($event)"
+                    required
+                    class="sr-only"
+                    aria-describedby="file-description"
+                  >
+                </label>
+                <p class="pl-1 flex items-center">or drag and drop</p>
+              </div>
+              <p id="file-description" class="text-xs text-gray-500">PNG, JPG, PDF up to 10MB</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Submit Button -->
+        <div class="mt-4">
+          <button
+            type="submit"
+            class="w-full flex justify-center items-center py-2 px-4 border border-transparent rounded-lg shadow-sm text-base font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition duration-150 ease-in-out"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0l-4 4m4-4v12" />
+            </svg>
+            Upload
+          </button>
+        </div>
+      </form>
+
+      <!-- File Preview Section -->
+      <div *ngIf="fileUrl" class="mt-4 p-3 bg-gray-50 rounded-lg border border-gray-200">
+        <p class="text-sm font-medium text-gray-700 mb-1">Uploaded file:</p>
+        <a [href]="fileUrl" download class="text-blue-600 hover:text-blue-800 underline text-sm flex items-center">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+          </svg>
+          Download
+        </a>
+        <div class="mt-2">
+          <img *ngIf="isImageFile()" [src]="fileUrl" alt="File preview" class="max-w-full h-auto rounded-lg shadow-sm">
+          <div *ngIf="!isImageFile()" class="flex items-center justify-center p-3 text-sm text-gray-500 bg-gray-100 rounded-lg">
+            <svg class="w-6 h-6 mr-2 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"></path>
+            </svg>
+            <span class="font-medium">{{ getFileName() }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  // Add JavaScript to handle the close modal when clicking outside
+  document.addEventListener('DOMContentLoaded', function() {
+    // This is just a placeholder since Angular handles the actual implementation
+    // In a pure HTML/JS implementation, we would handle the modal close here
+  });
+</script>
+</body>
+</html>
