@@ -5,6 +5,8 @@ import { Router } from '@angular/router';
 import { tap } from 'rxjs/operators';
 import { ToastrService } from 'ngx-toastr';
 
+import { environment } from './environment';
+
 @Injectable({
   providedIn: 'root',
 })
@@ -20,7 +22,7 @@ export class AuthService {
     this.autoLogout();
   }
 
-  private apiUrl = 'http://127.0.0.1:8000/api';
+  private apiUrl = environment.apiUrl + '/api';
 
   handleAuthentication(token: string, expiresAt: string): void {
     localStorage.setItem('token', token);

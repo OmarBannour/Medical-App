@@ -1,6 +1,7 @@
 import { HttpClient,HttpHeaders} from "@angular/common/http";
 import { Injectable } from "@angular/core";
 import { Observable } from "rxjs";
+import { environment } from './environment';
 
 
 
@@ -21,7 +22,7 @@ export interface Notification {
 })
 export class NotificationService {
 
-  private apiUrl='http://localhost:8000/api/notifications';
+  private apiUrl = environment.apiUrl + '/api/notifications';
   constructor(private http: HttpClient) { }
    // Get all notifications with filters
   getNotifications(page: number=1): Observable<Notification[]> {
