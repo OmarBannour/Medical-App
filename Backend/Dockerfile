@@ -23,14 +23,14 @@ WORKDIR /app
 # Copy application files
 COPY . .
 
-# Make entrypoint executable
-RUN chmod +x docker-entrypoint.sh
-
 # Install dependencies
 RUN composer install --no-dev --optimize-autoloader --no-interaction
 
 # Expose port
 EXPOSE ${PORT:-8000}
 
-# Start command
-ENTRYPOINT ["./docker-entrypoint.sh"]
+# Start command - run migrations and start server
+CMD php artisan config:clear && \
+    php artisan migrate --force && \
+    php artisan db:seed --force && \
+    php artisan serve --host=0.0.0.0 --port=${PORT:-8000}
