@@ -113,9 +113,9 @@ def predict():
             }
         }
 
-        # Get interpretation from LLM if requested
+        # Get interpretation from LLM if requested (skip if Ollama not available)
         interpretation = None
-        use_llm = request.args.get('interpret', 'true').lower() == 'true'
+        use_llm = request.args.get('interpret', 'false').lower() == 'true'  # Default to false for Railway
 
         if use_llm:
             try:
