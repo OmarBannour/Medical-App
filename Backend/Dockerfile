@@ -32,5 +32,5 @@ EXPOSE ${PORT:-8000}
 # Start command - run migrations and start server
 CMD php artisan config:clear && \
     php artisan migrate --force && \
-    php artisan db:seed --force && \
+    (php artisan db:seed --force || echo "Seeder skipped") && \
     php artisan serve --host=0.0.0.0 --port=${PORT:-8000}
