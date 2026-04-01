@@ -1,0 +1,89 @@
+FROM php:8.2-cli
+
+# Install system dependencies
+RUN apt-get update && apt-get install -y \
+    git \
+    curl \
+    libpng-dev \
+    libonig-dev \
+    libxml2-dev \
+    zip \
+    unzip \
+    python3 \
+    python3-pip \
+    supervisor \
+    && rm -rf /var/lib/apt/lists/*
+
+# Install PHP extensions
+RUN docker-php-ext-install pdo_mysql mbstring exif pcntl bcmath gd
+
+# Get Composer
+COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
+
+# Set working directory
+WORKDIR /app
+
+# Copy only dependency files first (for better caching)
+COPY composer.json composer.lock ./
+RUN composer install --no-dev --optimize-autoloader --no-interaction --no-scripts
+
+# Install Python dependencies (minimal set, CPU-only torch)
+RUN pip3 install --no-cache-dir --break-system-packages \
+    flask==3.0.0 \
+    torch==2.1.0+cpu \
+    torchvision==0.16.0+cpu \
+    -f https://download.pytorch.org/whl/torch_stable.html \
+    pillow==11.2.1 \
+    requests==2.32.3 \
+    numpy==1.24.3
+
+# Copy application files
+COPY . .
+
+# Run composer scripts
+RUN composer dump-autoload --optimize
+
+# Create supervisor config
+COPY <<EOF /etc/supervisor/conf.d/supervisord.conf
+[supervisord]
+nodaemon=true
+user=root
+
+[program:laravel]
+command=php artisan serve --host=0.0.0.0 --port=%(ENV_PORT)s
+directory=/app
+autostart=true
+autorestart=true
+stdout_logfile=/dev/stdout
+stdout_logfile_maxbytes=0
+stderr_logfile=/dev/stderr
+stderr_logfile_maxbytes=0
+
+[program:flask-pdf]
+command=python3 server.py
+directory=/app
+autostart=true
+autorestart=true
+stdout_logfile=/dev/stdout
+stdout_logfile_maxbytes=0
+stderr_logfile=/dev/stderr
+stderr_logfile_maxbytes=0
+
+[program:flask-ecg]
+command=python3 predict.py
+directory=/app
+autostart=true
+autorestart=true
+stdout_logfile=/dev/stdout
+stdout_logfile_maxbytes=0
+stderr_logfile=/dev/stderr
+stderr_logfile_maxbytes=0
+EOF
+
+# Expose port
+EXPOSE ${PORT:-8000}
+
+# Run migrations and start all services
+CMD php artisan migrate --force && \
+    php artisan db:seed --force && \
+    /usr/bin/supervisord -c /etc/supervisor/conf.d/supervisord.conf
