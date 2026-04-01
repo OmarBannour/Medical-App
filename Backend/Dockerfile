@@ -23,6 +23,9 @@ WORKDIR /app
 # Copy application files
 COPY . .
 
+# Make entrypoint executable
+RUN chmod +x docker-entrypoint.sh
+
 # Install dependencies
 RUN composer install --no-dev --optimize-autoloader --no-interaction
 
@@ -30,6 +33,4 @@ RUN composer install --no-dev --optimize-autoloader --no-interaction
 EXPOSE ${PORT:-8000}
 
 # Start command
-CMD php artisan migrate --force && \
-    php artisan db:seed --force && \
-    php artisan serve --host=0.0.0.0 --port=${PORT:-8000}
+ENTRYPOINT ["./docker-entrypoint.sh"]
